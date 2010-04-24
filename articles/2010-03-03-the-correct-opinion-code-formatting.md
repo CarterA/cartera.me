@@ -4,14 +4,14 @@ date: 2010/03/03
 
 There are several rules I follow when formatting my code, and I'd like to pass them on to you:  take them or leave them. Just keep in mind that this is, in fact, the correct opinion.  
 
-##General Rules  
+## General Rules #
 
 * There is **never** more then one empty line between any given pair of lines.  
 * If it can go on one line, then it **does**.
 * Any characters which are used to **close** a piece of code that is **multiple lines long**, should be **on their own line.** Examples of this include closing braces '`}`', closing parenthesis '`)`', and the end of a multi-line comment '`*/`'.
 * Whenever pointers '`*`' are used, they should be 'attached' to the variable *name*, not the variable type. For example, `NSString *theString;` is fine, but both `NSString* theString;` and `NSString * theString;` are not.  
 
-##Comments  
+## Comments ##
 
 * Comments that describe code should have a space after the '`//`' or '`/*`', but lines of code that are commented out for debugging purposes should not.  
 	Example:  
@@ -28,7 +28,7 @@ There are several rules I follow when formatting my code, and I'd like to pass t
 		*/  
 		- (NSString *)runMethod:(TheParam *)paramName;`  
 		
-##Methods  
+## Methods ##
 
 * Individual methods are never separated by a blank line. The only separator allowed for methods is a #pragma mark, and only when that is helpful.  
 * There is no space before the initial hyphen '`-`' or plus sign '`+`' at the beginning of the method name, but there is a space after it.  
