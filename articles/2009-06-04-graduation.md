@@ -1,0 +1,19 @@
+title: Graduation
+author: Carter Allen
+date: 2009/06/04
+
+
+
+I graduated today! Woo! I looked pretty spiffy in my black tux with my pink vest, if I do say so myself. Anyways, I gave a speech. Here it is, in the form that I read:
+
+
+<blockquote> 	This year our continuation speeches were supposed to be imaginative. Something different than the usual list of thank yous. A speech that would be memorable for content, but also for presentation. A poem, a story, a metaphor, an interpretive dance:  anything but yet another list.
+	None of those options appealed to me. If I did something too out-of-the-ordinary, I wouldnt be able to get across the right message and thank the right people. Thus, Ive decided to stick with the status quo. I will do what hundreds of students have done before me, and thank the people that have helped me out through my journey. This speech may not by imaginative, creative, or new in any way:  but at least itll go against the guidelines. And that counts for something.
+	Ill begin my list by thanking my mom, Dina Allen. She taught me to question unjust rules (or guidelines), and to not be concerned with breaking them, especially when youre planning on driving away in a limo afterwards.
+	Next Id like to mention my dad, Philip Allen. Youve been a great friend and mentor to me, for my entire life:  thank you so much for the time youve given me.
+	I would also like to thank a product also shaped by Logan, my brother:  Austin Allen. Austin:  Youve been more of an influence on my life than you could ever imagine. Youve been there when I needed a brother, and more importantly, youve always been there when I just needed a friend.
+	Thats all of my immediate family, but Id also like to thank the two extensions of my family that have stuck with me for the past year and a half. My best friends, William and George. William, youve been the most dependable and selfless person Ive ever had the pleasure of knowing:  even when I didnt deserve your kindness, you gave it to me. George, people say were the same person:  I disagree. I would never understand myself as well as you understand me. Thank you so much, both of you, for standing by me:  no matter how hard the road got.
+	And through my years at Logan, a few other people that Ive worked with have really stood out. My little buddies, Aiden, Teddy, and Nate:  you three taught me how to be patient, and how to be a role model. Mark Suzuki and Zach Fisher, you both have always treated me as a peer, had in-depth discussions with me, and helped me to understand and form my own opinions on issues in the world. Justine Zollo, you gave me the gift of an incredible awareness. You opened my eyes to the worlds flaws, and how I could work to remedy them. And finally, Eric Benson, you mentored me through years of math and science, helped me on extra projects, and most of all, you believed in me.
+	I leave this school now with a heightened intellect, and a greater awareness of the world I live in. I leave with the abilities and mindset that I need to change the world to be a better place. And I leave behind a hope that this school will continue to give students these amazing gifts:  the world needs them.</blockquote>
+
+If you read this far, good job.
