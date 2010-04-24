@@ -29,6 +29,7 @@ toto = Toto::Server.new do
   set :date do |now|
       now.strftime("%B #{now.day.ordinal} %Y")
   end
+  set :url,       "http://blog.cartera.me"
   set :markdown,  :smart                                    # use markdown + smart-mode
   set :disqus,    "cartera"                                   # disqus id, or false
   set :summary,   :max => 150, :delim => /~/                # length of article summary and delimiter
