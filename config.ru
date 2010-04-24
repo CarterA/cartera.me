@@ -27,10 +27,11 @@ toto = Toto::Server.new do
   set :title,     "Carter Allens Blog"                   	  # site title
   # set :root,      "index"                                   # page to load on /
   set :date do |now|
-      now.strftime("%B #{now.day.ordinal} %Y")  # date format for articles
+      now.strftime("%B #{now.day.ordinal} %Y")
+  end
   set :markdown,  :smart                                    # use markdown + smart-mode
   set :disqus,    "cartera"                                   # disqus id, or false
-  # set :summary,   :max => 150, :delim => /~/                # length of article summary and delimiter
+  set :summary,   :max => 150, :delim => /~/                # length of article summary and delimiter
   set :ext,       'md'                                     # file extension for articles
   set :cache,      28800                                    # cache duration, in seconds
 end
