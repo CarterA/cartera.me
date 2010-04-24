@@ -1,4 +1,4 @@
-title: The Correct Opinion: Code Formatting  
+title: The Correct Opinion - Code Formatting  
 author: Carter Allen  
 date: 2010/03/03  
 
