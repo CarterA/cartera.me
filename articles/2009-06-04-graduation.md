@@ -2,10 +2,7 @@ title: Graduation
 author: Carter Allen
 date: 2009/06/04
 
-
-
-I graduated today! Woo! I looked pretty spiffy in my black tux with my pink vest, if I do say so myself. Anyways, I gave a speech. Here it is, in the form that I read:
-
+I graduated today! Woo! I looked pretty spiffy in my black tux with my pink vest, if I do say so myself. Anyways, I gave a speech. Here it is, in the form that I read:  
 
 <blockquote> 	This year our continuation speeches were supposed to be imaginative. Something different than the usual list of thank yous. A speech that would be memorable for content, but also for presentation. A poem, a story, a metaphor, an interpretive dance:  anything but yet another list.
 	None of those options appealed to me. If I did something too out-of-the-ordinary, I wouldnt be able to get across the right message and thank the right people. Thus, Ive decided to stick with the status quo. I will do what hundreds of students have done before me, and thank the people that have helped me out through my journey. This speech may not by imaginative, creative, or new in any way:  but at least itll go against the guidelines. And that counts for something.
