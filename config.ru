@@ -17,15 +17,15 @@ toto = Toto::Server.new do
   # Add your settings here
   # set [:setting], [value]
   # 
-  # set :author,    Carter Allen                              # blog author
-  # set :title,     Carter Allen's Blog                   	  # site title
+  set :author,    Carter Allen                              # blog author
+  set :title,     Carter Allen's Blog                   	  # site title
   # set :root,      "index"                                   # page to load on /
-  # set :date,      lambda {|now| now.strftime("%d/%m/%Y") }  # date format for articles
-  # set :markdown,  :smart                                    # use markdown + smart-mode
-  # set :disqus,    cartera                                   # disqus id, or false
-  # set :summary,   :max => 150, :delim => /~/                # length of article summary and delimiter
-  # set :ext,       'md'                                     # file extension for articles
-  # set :cache,      28800                                    # cache duration, in seconds
+  set :date,      lambda {|now| now.strftime("%d/%m/%Y") }  # date format for articles
+  set :markdown,  :smart                                    # use markdown + smart-mode
+  set :disqus,    cartera                                   # disqus id, or false
+  set :summary,   :max => 150, :delim => /~/                # length of article summary and delimiter
+  set :ext,       'md'                                     # file extension for articles
+  set :cache,      28800                                    # cache duration, in seconds
 
   set :date, lambda {|now| now.strftime("%B #{now.day.ordinal} %Y") }
 end
