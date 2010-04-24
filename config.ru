@@ -9,6 +9,12 @@ use Rack::CommonLogger
   use Rack::ShowExceptions
 #end
 
+class Toto::Site
+  def log *args
+    index *args
+  end
+end
+
 #
 # Create and configure a toto instance
 #
@@ -27,8 +33,6 @@ toto = Toto::Server.new do
   set :summary,   :max => 150, :delim => /~/                # length of article summary and delimiter
   set :ext,       'md'                                     # file extension for articles
   set :cache,      28800                                    # cache duration, in seconds
-
-  set :date, lambda {|now| now.strftime("%B #{now.day.ordinal} %Y") }
 end
 
 run toto
