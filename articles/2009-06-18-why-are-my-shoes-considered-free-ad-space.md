@@ -1,6 +1,6 @@
-title: Why are my shoes considered free ad space?
-author: Carter Allen
-date: 2009/06/18
+title: Why are my shoes considered free ad space?  
+author: Carter Allen  
+date: 2009/06/18  
 
 In general, unless you're buying designer clothes, the brand of a piece of clothing is fairly subtly added to your clothes. This is advertising, but it isn't extremely obvious or obnoxious. This of course changes when you buy designer clothes, but I'm not a poser: so that doesn't really apply to me.  
 

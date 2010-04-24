@@ -1,6 +1,6 @@
-title: Metamorphosis
-author: Carter Allen
-date: 2009/03/25
+title: Metamorphosis  
+author: Carter Allen  
+date: 2009/03/25  
 
 Papa Roach released their new album. I am in love.  
 

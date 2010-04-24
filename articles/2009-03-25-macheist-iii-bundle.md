@@ -1,6 +1,6 @@
-title: Macheist III Bundle
-author: Carter Allen
-date: 2009/03/25
+title: Macheist III Bundle  
+author: Carter Allen  
+date: 2009/03/25  
 
 ...sucks. I swear to god, if shareware mac devs don't start hiring UI/icon designers, I'm going to pay for them myself.  
 

@@ -1,6 +1,6 @@
-title: Understanding Object-Oriented Programming and the MVC System
-author: Carter Allen
-date: 2009/04/15
+title: Understanding Object-Oriented Programming and the MVC System  
+author: Carter Allen  
+date: 2009/04/15  
 
 
 

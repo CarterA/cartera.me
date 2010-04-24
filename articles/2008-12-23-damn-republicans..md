@@ -1,6 +1,6 @@
-title: Damn Republicans.
-author: Carter Allen
-date: 2008/12/23
+title: Damn Republicans.  
+author: Carter Allen  
+date: 2008/12/23  
 
 So a lot of people in my school hate me now. Not sure how it happened so damned quickly, but you know, that's what happens when you read off a speech that calls Catholics and Republicans idiots. I swear, I told nothing but truth. Truth hurts, but in this case, it's hurting me the most.  
 

@@ -1,6 +1,6 @@
-title: Canabalt is the Perfect Game
-author: Carter Allen
-date: 2009/10/11
+title: Canabalt is the Perfect Game  
+author: Carter Allen  
+date: 2009/10/11  
 
 <a title="Canabalt Home Screen by CarterA, on Flickr" href="http://www.flickr.com/photos/33672094@N07/3999572734/"><img src="http://farm3.static.flickr.com/2460/3999572734_ae54474bea_o.png" alt="Canabalt Home Screen" width="480" height="320" /></a>
 

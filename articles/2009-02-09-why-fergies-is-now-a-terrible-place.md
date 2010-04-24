@@ -1,6 +1,6 @@
-title: Why Fergie's is now a terrible place
-author: Carter Allen
-date: 2009/02/09
+title: Why Fergie's is now a terrible place  
+author: Carter Allen  
+date: 2009/02/09  
 
 There's a restaurant in the area of my school called Fergie's. It started out as a frozen custard shop run by a family. Back then, it was an excellent place. They had unique menu selections, and great service. I really loved that place.  
 

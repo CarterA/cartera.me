@@ -1,6 +1,6 @@
-title: Changing Leopard's Spots
-author: Carter Allen
-date: 2009/08/17
+title: Changing Leopard's Spots  
+author: Carter Allen  
+date: 2009/08/17  
 
 I'd like to take a moment to explain some things that seem to not be properly understood here.  
 

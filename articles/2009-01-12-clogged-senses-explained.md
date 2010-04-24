@@ -1,6 +1,6 @@
-title: Clogged Senses -- Explained
-author: Carter Allen
-date: 2009/01/12
+title: Clogged Senses -- Explained  
+author: Carter Allen  
+date: 2009/01/12  
 
 My last post, "Clogged Senses," confused a lot of people, including myself. It was late at night and my mind was a bit out of whack. Yet, when I read it again, it still all makes perfect sense to me. The key is understanding all the pieces of the analogy.  
 

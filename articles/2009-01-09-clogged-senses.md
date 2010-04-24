@@ -1,6 +1,6 @@
-title: Clogged Senses
-author: Carter Allen
-date: 2009/01/09
+title: Clogged Senses  
+author: Carter Allen  
+date: 2009/01/09  
 
 Bear with me for a moment here, okay? So, imagine you're in the middle of a huge city. Skyscrapers all around you, blocking your view of the world around you. Cars are rushing around everywhere, and people are yelling and screaming on the sidewalks. The walls on the buildings are covered in graffiti, and windows have been smashed in. In the distance you hear gunshots, sirens, and a sharp shriek, probably from a child. You cannot hear yourself think.  
 

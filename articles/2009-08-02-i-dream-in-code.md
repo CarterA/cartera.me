@@ -1,6 +1,6 @@
-title: I Dream in Code
-author: Carter Allen
-date: 2009/08/02
+title: I Dream in Code  
+author: Carter Allen  
+date: 2009/08/02  
 
 A few days ago, my brother woke me up. I was very intent on telling him that I had solved his code error: he had forgotten a semicolon. Now, a bit of background here. My brother doesn't program. He never has, and never will. Also, the easiest error to make when programming in Objective-C (which I do) is to forget to append every line with a semicolon. Thus, I probably meant to make him feel dumb about his amateur coding mistake: if he had actually made it.
 

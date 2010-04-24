@@ -1,6 +1,6 @@
-title: Entitlement
-author: Carter Allen
-date: 2009/04/21
+title: Entitlement  
+author: Carter Allen  
+date: 2009/04/21  
 
 Most people have heard that the iTunes Music Store is raising prices on a ton of songs. People are quite pissed at the 30 cent increase in price. I don't get it. Since when were people entitled to 99 cent songs? Have you ever tried to buy a real CD? It's not like that happens in a record store. And people dislike the variations in the pricing. When you go to a record store, is the brand new release of the popular band more expensive than the month-old releases by the B-rated band? Yep. this is just bringing more complexity to a market that wasn't working perfectly. And the artists get more money which is good.  
 

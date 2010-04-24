@@ -1,6 +1,6 @@
-title: Carbon Offsets
-author: Carter Allen
-date: 2009/05/18
+title: Carbon Offsets  
+author: Carter Allen  
+date: 2009/05/18  
 
 I was reading through a thread in a forum online, and someone was mentioning carbon offsets. I haven't ever really researched them, but they always sounded like a great concept to me.  
 

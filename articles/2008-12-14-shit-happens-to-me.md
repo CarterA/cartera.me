@@ -1,6 +1,6 @@
-title: Shit happens. To me.
-author: Carter Allen
-date: 2008/12/14
+title: Shit happens. To me.  
+author: Carter Allen  
+date: 2008/12/14  
 
 How did this happen?  
 

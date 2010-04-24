@@ -1,6 +1,6 @@
-title: Seven Ways to Tell if Your Band is Too Old
-author: Carter Allen
-date: 2009/06/13
+title: Seven Ways to Tell if Your Band is Too Old  
+author: Carter Allen  
+date: 2009/06/13  
 
 1. Your hair is longer than your most recent concert tour.  
 2. The pitch of your singing is almost as high as you were last night.  

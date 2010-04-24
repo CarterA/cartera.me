@@ -1,6 +1,6 @@
-title: Music, Again
-author: Carter Allen
-date: 2009/03/01
+title: Music, Again  
+author: Carter Allen  
+date: 2009/03/01  
 
 A while back I did a quick post about music. Here goes another one...  
 

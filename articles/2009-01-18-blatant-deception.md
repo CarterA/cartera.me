@@ -1,6 +1,6 @@
-title: Blatant Deception
-author: Carter Allen
-date: 2009/01/18
+title: Blatant Deception  
+author: Carter Allen  
+date: 2009/01/18  
 
 One of my parents is lying. I can't tell which one.  
 

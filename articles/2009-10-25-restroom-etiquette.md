@@ -1,6 +1,6 @@
-title: Restroom Etiquette
-author: Carter Allen
-date: 2009/10/25
+title: Restroom Etiquette  
+author: Carter Allen  
+date: 2009/10/25  
 
 Restroom etiquette is an important topic to cover, and should be treated as such. My parents never taught me much about the complexities that can be found when in a public restroom, and I thought that sharing my own experiences and discoveries might benefit some of you less-experienced people out there. I've divided this post into two sections, one for those of you who use restrooms, and one for the rare person that plans/constructs restrooms. Keep in mind that all of this is written from the perspective of a man, so women's restrooms may not fit into these rules. Enjoy.  
 

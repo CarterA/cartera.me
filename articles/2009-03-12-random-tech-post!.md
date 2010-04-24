@@ -1,6 +1,6 @@
-title: Random Tech Post!
-author: Carter Allen
-date: 2009/03/12
+title: Random Tech Post!  
+author: Carter Allen  
+date: 2009/03/12  
 
 I have a few topics to cover in this post, including my thoughts on Apple's new iPod Shuffle, Amazon's WhisperSync technology, and the Kindle 2.  
 

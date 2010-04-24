@@ -1,6 +1,6 @@
-title: Cropped Out, and Gloss
-author: Carter Allen
-date: 2009/03/23
+title: Cropped Out, and Gloss  
+author: Carter Allen  
+date: 2009/03/23  
 
 I know, the two topics have nothing to do with each other. And no, I'm not referring to the infamous MTF member Gloss, I'm referring to the "artistic" style of many icons nowadays.  
 

@@ -1,6 +1,6 @@
-title: Graduation
-author: Carter Allen
-date: 2009/06/04
+title: Graduation  
+author: Carter Allen  
+date: 2009/06/04  
 
 I graduated today! Woo! I looked pretty spiffy in my black tux with my pink vest, if I do say so myself. Anyways, I gave a speech. Here it is, in the form that I read:  
 
