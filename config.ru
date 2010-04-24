@@ -5,9 +5,9 @@ require 'toto'
 use Rack::Static, :urls => ['/css', '/js', '/images', '/favicon.ico'], :root => 'public'
 use Rack::CommonLogger
 
-if ENV['RACK_ENV'] == 'development'
+#if ENV['RACK_ENV'] == 'development'
   use Rack::ShowExceptions
-end
+#end
 
 #
 # Create and configure a toto instance
