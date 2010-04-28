@@ -2,11 +2,13 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="/css/main.css">
+	<link rel="stylesheet" type="text/css" href="/css/prettify.css">
     <link rel="alternate" type="application/atom+xml" title="<%= title %> - feed" href="/index.xml" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
     <title><%= title %></title>
+	<script type="text/javascript" src="/js/prettify.js"></script>
   </head>
-  <body>
+  <body onload="prettyPrint();">
     <section>
       <%= yield %> 
     </section>
