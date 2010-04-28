@@ -1,4 +1,5 @@
-title: Clogged Senses -- Explained  
+title: Clogged Senses - Explained  
+slug: clogged-senses-explained  
 author: Carter Allen  
 date: 2009/01/12  
 
