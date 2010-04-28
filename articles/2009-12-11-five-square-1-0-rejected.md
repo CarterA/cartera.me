@@ -1,4 +1,5 @@
 title: Five Square 1.0 Rejected  
+slug: five-square-1-0-rejected
 author: Carter Allen  
 date: 2009/12/11  
 
