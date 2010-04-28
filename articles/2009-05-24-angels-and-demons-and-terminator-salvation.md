@@ -1,4 +1,5 @@
 title: Angels and Demons, Terminator Salvation  
+slug: angels-and-demons-terminator-salvation  
 author: Carter Allen  
 date: 2009/05/24  
 
