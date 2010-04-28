@@ -3,7 +3,7 @@ slug: the-correct-opinion-code-formatting
 author: Carter Allen  
 date: 2010/03/03  
 
-There are several rules I follow when formatting my code, and I'd like to pass them on to you:  take them or leave them. Just keep in mind that this is, in fact, the correct opinion.  
+There are several rules I follow when formatting my code, and I'd like to pass them on to you:  take them or leave them. Just keep in mind that this is, in fact, the correct opinion.~  
 
 ## General Rules #
 
