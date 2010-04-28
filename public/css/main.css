@@ -108,3 +108,6 @@ body > footer {
   font-size: 18px;
   color: #888;
 }
+pre.overflow_visible_hover, pre.overflow_visible_sticky {
+	overflow: visible;
+}
