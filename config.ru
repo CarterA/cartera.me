@@ -1,17 +1,12 @@
-
 require 'toto'
-require "rack/pygments"
 
 # Rack config
 use Rack::Static, :urls => ['/css', '/js', '/images', '/favicon.ico'], :root => 'public'
 use Rack::CommonLogger
 
-#if ENV['RACK_ENV'] == 'development'
+if ENV['RACK_ENV'] == 'development'
   use Rack::ShowExceptions
-#end
-
-#use Rack::Pygments, :html_tag => "code",
-                    #:html_attr => "lang"
+end
 
 class Toto::Site
   def log *args
