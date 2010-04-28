@@ -2,7 +2,7 @@ title: Installing iPhone OS [REDACTED] Beta Firmware
 author: Carter Allen  
 date: 2010/04/09  
 
-So you want to install the beta? Well, I have. Here are my suggestions (read them all the way through before starting):  
+So you want to install the beta? Well, I have. Here are my suggestions (read them all the way through before starting):~  
 
 1. Update to iTunes 9.1 first.  
 2. Download and install the beta version of the Developer Tools package.  
