@@ -6,9 +6,18 @@
     <link rel="alternate" type="application/atom+xml" title="<%= title %> - feed" href="/index.xml" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
     <title><%= title %></title>
+	<script type="text/javascript" src="/js/jquery.js"></script>
 	<script type="text/javascript" src="/js/prettify.js"></script>
+	<script>
+		$(document).ready(function(){
+		    $("pre code").each(function(){
+		        $(this).addClass('prettyprint');
+		    });
+		    prettyPrint();
+		});
+	</script>
   </head>
-  <body onload="prettyPrint();">
+  <body>
     <section>
       <%= yield %> 
     </section>
