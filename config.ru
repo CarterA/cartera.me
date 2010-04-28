@@ -10,8 +10,8 @@ use Rack::CommonLogger
   use Rack::ShowExceptions
 #end
 
-use Rack::Pygments, :html_tag => "code",
-                    :html_attr => "lang"
+#use Rack::Pygments, :html_tag => "code",
+                    #:html_attr => "lang"
 
 class Toto::Site
   def log *args
