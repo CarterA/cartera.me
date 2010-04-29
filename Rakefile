@@ -1,4 +1,4 @@
-require 'toto'
+require 'cartera-toto'
 
 @config = Toto::Config::Defaults
 

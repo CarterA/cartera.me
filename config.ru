@@ -1,4 +1,4 @@
-require 'toto'
+require 'cartera-toto'
 
 # Rack config
 use Rack::Static, :urls => ['/css', '/js', '/images', '/favicon.ico'], :root => 'public'
