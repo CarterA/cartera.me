@@ -1,12 +1,20 @@
 require 'toto'
+require 'rack-rewrite'
+if ENV['RACK_ENV'] == 'production'
+  use Rack::Rewrite do
+    r301 %r{.*}, 'http://blog.cartera.me$&', :if => Proc.new  do |rack_env|
+      rack_env['SERVER_NAME'] != 'blog.artera.me'
+    end
+  end
+end
 
 # Rack config
 use Rack::Static, :urls => ['/css', '/js', '/images', '/favicon.ico'], :root => 'public'
 use Rack::CommonLogger
 
-#if ENV['RACK_ENV'] == 'development'
+if ENV['RACK_ENV'] == 'development'
   use Rack::ShowExceptions
-#end
+end
 
 class Toto::Site
   def log *args
