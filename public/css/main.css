@@ -111,3 +111,8 @@ body > footer {
 pre.overflow_visible_hover, pre.overflow_visible_sticky {
 	overflow: visible;
 }
+.center {
+	display: block;
+	margin-left: auto;
+	margin-right: auto
+}
