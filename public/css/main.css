@@ -7,7 +7,7 @@ body {
 header, footer, section, article {
 	display: block;
 }
-section#articles, footer {
+footer, .post {
 	padding: 15px;
 	width: 70%;
 	float:right;
