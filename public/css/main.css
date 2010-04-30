@@ -4,18 +4,24 @@ body {
   font-size: 20px;
   line-height: 30px;
 }
+section#wrapper {
+	margin: auto;
+	width: 950px;
+}
 header, footer, section, article {
 	display: block;
 }
 footer, .post {
 	padding: 15px;
-	width: 70%;
-	float:right;
+	width: 700px;
+	/*float:right;*/
+	margin-left: 250px;
 }
 section#sidebar {
 	background-color: #d8d8d8;
 	padding: 10px;
-	width: 23%;
+	/*width: 23%;*/
+	width: 200px;
 	float:left;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
