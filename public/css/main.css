@@ -1,17 +1,25 @@
 html { margin: 20px }
 body {
-  margin: 0 auto;
   font-family: 'Baskerville', Georgia, Times, serif;
   font-size: 20px;
   line-height: 30px;
-  padding: 15px;
-  width: 720px;
-
 }
 header, footer, section, article {
 	display: block;
 }
-#content {
+section#articles, footer {
+	padding: 15px;
+	width: 70%;
+	float:right;
+}
+section#sidebar {
+	background-color: #d8d8d8;
+	padding: 10px;
+	width: 23%;
+	float:left;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
 }
 #by {
 	font-style: italic;
