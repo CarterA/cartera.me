@@ -4,17 +4,16 @@ body {
   font-size: 20px;
   line-height: 30px;
 }
-section#wrapper {
+section#wrapper, footer {
 	margin: auto;
 	width: 950px;
 }
-header, footer, section, article {
+header, section, article {
 	display: block;
 }
-footer, .post {
+.post {
 	padding: 15px;
 	width: 700px;
-	/*float:right;*/
 	margin-left: 250px;
 }
 section#sidebar {
@@ -117,7 +116,7 @@ blockquote {
 
 body > footer {
   text-align: left;
-  margin-left: 10px;
+  /*margin-left: 10px;*/
 	font-style: italic;
   font-size: 18px;
   color: #888;
