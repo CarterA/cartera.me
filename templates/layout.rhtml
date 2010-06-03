@@ -1,24 +1,26 @@
 <!DOCTYPE HTML>
 <html lang="en">
-  <head>
-	<meta charset="utf-8">
-	<link rel="stylesheet" href="/css/main.css">
-	<link rel="stylesheet" href="/css/prettify.css">
-	<link rel="alternate" type="application/atom+xml" title="<%= title %> - feed" href="/index.xml">
-	<title><%= title %></title>
-	<script src="/js/jquery.prettify.js"></script>
-	<script src="/js/main.js"></script>
-  </head>
-  <body>
-    <section id="wrapper">
-	<section id="top">
-		<img id="logo" src="/images/hat.png" width=160 height=160>
-		<p id="logotype">carter<b>allen</b><p id="blogTitleText"> ~	blog</p></p>
-	</section>
-	<%= yield %>
-	</section>
-	<footer>
-		Powered by <a href="http://cloudhead.io/toto">toto</a>
-	</footer>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="/css/main.css">
+		<link rel="stylesheet" href="/css/prettify.css">
+		<link rel="alternate" type="application/atom+xml" title="<%= title %> - feed" href="/index.xml">
+		<title><%= title %></title>
+		<script src="/js/jquery.prettify.js"></script>
+		<script src="/js/main.js"></script>
+	</head>
+	<body>
+		<section id="wrapper">
+			<a href="/." alt="Carter Allen's Blog - Home">
+				<section id="top">
+					<img id="logo" src="/images/hat.png" width=160 height=160>
+					<p id="logotype">carter<b>allen</b><p id="blogTitleText"> ~	blog</p></p>
+				</section>
+			</a>
+			<%= yield %>
+			<footer>
+				Powered by <a href="http://cloudhead.io/toto">toto</a>
+			</footer>
+		</section>
 	</body>
 </html>
