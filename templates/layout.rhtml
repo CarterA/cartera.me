@@ -10,17 +10,15 @@
 		<script src="/js/main.js"></script>
 	</head>
 	<body>
-		<section id="wrapper">
+		<header>
 			<a href="/." alt="Carter Allen's Blog - Home">
-				<section id="top">
-					<img id="logo" src="/images/hat.png" width=160 height=160>
-					<p id="logotype">carter<b>allen</b><p id="blogTitleText"> ~	blog</p></p>
-				</section>
+				<img id="logo" src="/images/hat.png" width=160 height=160>
+				<p id="logotype">carter<b>allen</b><p id="blogTitleText"> ~	blog</p></p>
 			</a>
-			<%= yield %>
-			<footer>
-				Powered by <a href="http://cloudhead.io/toto">toto</a>
-			</footer>
-		</section>
+		</header>
+		<%= yield %>
+		<footer>
+			Powered by <a href="http://cloudhead.io/toto">toto</a>
+		</footer>
 	</body>
 </html>

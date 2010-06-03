@@ -1,26 +1,17 @@
 html { margin: 20px }
 body {
-  font-family: 'Baskerville', Georgia, Times, serif;
-  font-size: 20px;
-  line-height: 30px;
-}
-section#wrapper, footer {
+	font-family: 'Baskerville', Georgia, Times, serif;
+	font-size: 20px;
+	line-height: 30px;
 	margin: auto;
-	float: center;
 	width: 700px;
 }
-header, section, article { display: block; }
+body > header, section, article { display: block; }
 .post {
 	padding: 15px;
 	width: 700px;
 }
-section#comments {
-	background-color: #d8d8d8;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-}
-section#top {
+body > header {
 	height: 160px;
 	background-color: #d8d8d8;
 	width: 700px;
@@ -29,7 +20,7 @@ section#top {
 	border-radius: 5px;
 	margin-bottom: 30px;
 }
-#wrapper a {
+body > header a {
 	text-decoration: none;
 	color: black;
 }
@@ -93,12 +84,6 @@ body > header > h1 {
 }
 .more a { text-decoration: none; }
 .more a:hover { text-decoration: underline }
-body > header {
-	display: block;
-	padding-top: 30px;
-	line-height: 180px;
-	margin-bottom: 20px;
-}
 h1, h2, h3, h4 {
 	display: inline;
 	margin: 0;
