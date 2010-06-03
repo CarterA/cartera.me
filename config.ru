@@ -1,5 +1,4 @@
 require 'toto'
-require 'rack-codehighlighter'
 
 # Rack config
 use Rack::Static, :urls => ['/css', '/js', '/images', '/favicon.ico'], :root => 'public'
