@@ -1,6 +1,6 @@
 builder   --source=http://gemcutter.org
 rdiscount --source=http://gemcutter.org
 cartera-toto --source=http://gemcutter.org --version=">= 0.2.8"
+nokogiri --source=http://gemcutter.org --version="1.4.1"
 hyperbolist-rack-codehighlighter --source=http://gemcutter.org
 ultraviolet --source=http://gemcutter.org
-nokogiri --source=http://gemcutter.org --version="1.4.1"
