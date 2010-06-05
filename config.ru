@@ -8,7 +8,8 @@ use Rack::Codehighlighter, :ultraviolet,
   :element => "pre>code", :pattern => /\A:::(\w+)\s*\n/,
   :themes => {"cobalt" => ["ruby"], "zenburnesque" => ["c", "sql"]},
   :logging => true,
-  :lines => true
+  :lines => true,
+  :markdown => true
 #use Rack::Codehighlighter, :ultraviolet, :theme => 'dawn', :lines => true, :element => "pre>code", :pattern => /\A:::(\w+)\s*\n/, :logging => true
 
 # Rack config
