@@ -4,12 +4,12 @@ require 'rack/codehighlighter'
 #use Rack::Codehighlighter, :coderay, :markdown => true, :element => "pre>code", :pattern => /\A:::(\w+)\s*(\n|&#x000A;)/i, :logging => true
 #use Rack::Codehighlighter, :pygments_api, :element => "pre>code", :pattern => /\A:::(\w+)\s*\n/, :logging => true, :markdown => true, :lines => true
 use Rack::Codehighlighter, :ultraviolet, 
-  :element => "pre>code",
+  :element => "code",
   :pattern => /\A:::([-_\w]+)\s*(\n|&#x000A;)/i,
   :theme => "dawn",
   :logging => true,
   :lines => true,
-  :markdown => false
+  :markdown => true
 #use Rack::Codehighlighter, :ultraviolet, :theme => 'dawn', :lines => true, :element => "pre>code", :pattern => /\A:::(\w+)\s*\n/, :logging => true
 
 # Rack config
