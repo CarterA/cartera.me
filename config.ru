@@ -6,7 +6,7 @@ require 'rack/codehighlighter'
 use Rack::ShowExceptions
 use Rack::Codehighlighter, :ultraviolet, 
   :element => "pre>code", :pattern => /\A:::(\w+)\s*\n/,
-  :themes => {"cobalt" => ["ruby"], "zenburnesque" => ["c", "sql"]},
+  :theme => "dawn",
   :logging => true,
   :lines => true,
   :markdown => true
