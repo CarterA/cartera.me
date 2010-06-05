@@ -5,7 +5,7 @@ require 'rack/codehighlighter'
 #use Rack::Codehighlighter, :pygments_api, :element => "pre>code", :pattern => /\A:::(\w+)\s*\n/, :logging => true, :markdown => true, :lines => true
 use Rack::ShowExceptions
 use Rack::Codehighlighter, :ultraviolet, 
-  :element => "pre", :pattern => /\A:::(\w+)\s*\n/,
+  :element => "pre>code", :pattern => /\A:::(\w+)\s*\n/,
   :themes => {"cobalt" => ["ruby"], "zenburnesque" => ["c", "sql"]},
   :logging => true,
   :lines => true,
