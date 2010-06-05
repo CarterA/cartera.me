@@ -1,7 +1,7 @@
 $(document).ready(function(){
-    $("pre code").each(function(){
+    /*$("pre code").each(function(){
         $(this).addClass('prettyprint');
-    });
+    });*/
 	// Toggle overflow on code blocks.
 	$('head').append($("<style type='text/css'>pre{overflow:hidden}<\/style>"));
 	$('pre').hover(function(){
@@ -12,5 +12,5 @@ $(document).ready(function(){
 	$('pre').click(function(){
 	    $(this).toggleClass('overflow_visible_sticky');
 	});
-    prettyPrint();
+    //prettyPrint();
 });

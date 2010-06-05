@@ -1,3 +1,4 @@
+html { margin: 20px; }
 body {
 	font-family: 'Baskerville', Georgia, Times, serif;
 	font-size: 20px;
@@ -31,7 +32,7 @@ p#logotype {
 }
 p#blogTitleText {
 	position: absolute;
-	margin: 64px 0px 0px 540px;
+	margin: 74px 0px 0px 540px;
 	font-size: 24pt;
 }
 #caption {
@@ -86,7 +87,7 @@ pre.overflow_visible_hover, pre.overflow_visible_sticky { overflow: visible; }
 	padding:0px;
 }
 /* Pretty printing styles. Used with prettify.js. */
-.str { color: #080; }
+/*.str { color: #080; }
 .kwd { color: #008; }
 .com { color: #800; }
 .typ { color: #606; }
@@ -109,4 +110,4 @@ pre.prettyprint { padding: 2px; border: 1px solid #888; }
   .tag { color: #006; font-weight: bold; }
   .atn { color: #404; }
   .atv { color: #060; }
-}
+}*/
