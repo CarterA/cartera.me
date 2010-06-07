@@ -86,6 +86,42 @@ pre.overflow_visible_hover, pre.overflow_visible_sticky { overflow: visible; }
 	margin: 0px;
 	padding:0px;
 }
+div.vcard {
+	margin: auto;
+	position: absolute;
+	padding: 20px 0px 0px 20px;
+	width: 500px;
+	height: 170px;
+	background-color: #d8d8d8;
+	border-radius: 5px;
+}
+div.vcard p, div.vcard a {
+	margin: 0px;
+	line-height: normal;
+}
+div.vcard img.photo {
+	float: left;
+	margin-right: 20px;
+	border-radius: 5px;
+}
+div.vcard div#links {
+	width: 300px;
+	height: 26px;
+	margin-left: 170px;
+}
+div.vcard div#links a {
+	display: block;
+	width: 26px;
+	height: 26px;
+	margin-left: 4px;
+	float: left;
+}
+div.vcard div#links a.email {
+	margin-left: 0px;
+	background: url(../images/icons/email.png) 1px 1px no-repeat; 
+}
+div.vcard div#links a#aim { background: url(../images/icons/aim.png) 1px 1px no-repeat; }
+div.vcard div#links a#skype { background: url(../images/icons/skype.png) 1px 1px no-repeat; }
 /* Pretty printing styles. Used with prettify.js. */
 /*.str { color: #080; }
 .kwd { color: #008; }
