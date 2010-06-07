@@ -1,16 +1,7 @@
 require 'toto'
 require 'uv'
 require 'rack/codehighlighter'
-#use Rack::Codehighlighter, :coderay, :markdown => true, :element => "pre>code", :pattern => /\A:::(\w+)\s*(\n|&#x000A;)/i, :logging => true
 use Rack::Codehighlighter, :pygments_api, :element => "pre>code", :pattern => /\A:::([-_\w]+)\s*(\n|&#x000A;)/i, :logging => true, :markdown => true, :lines => true
-#use Rack::Codehighlighter, :ultraviolet, 
-#  :element => "pre",
-#  :pattern => /\A:::([-_\w]+)\s*(\n|&#x000A;)/i,
-#  :theme => "dawn",
-#  :logging => true,
-#  :lines => true,
-#  :markdown => true
-#use Rack::Codehighlighter, :ultraviolet, :theme => 'dawn', :lines => true, :element => "pre>code", :pattern => /\A:::(\w+)\s*\n/, :logging => true
 
 # Rack config
 use Rack::Static, :urls => ['/css', '/js', '/images', '/favicon.ico'], :root => 'public'
