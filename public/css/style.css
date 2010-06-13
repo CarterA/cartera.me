@@ -115,6 +115,11 @@ div.vcard div#links a {
 	height: 26px;
 	margin-left: 4px;
 	float: left;
+	text-indent: -1000px;
+}
+div.vcard div#links a:hover {
+	background-color: #7f7f7f;
+	border-radius: 2px;
 }
 div.vcard div#links a.email {
 	margin-left: 0px;
