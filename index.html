@@ -14,9 +14,11 @@ title: Carter Allen's Blog
 	<div class="more"><a href="{{ post.url }}">read on &raquo;</a></div>
 </article>
 {% endfor %}
-{% if paginator.previous_page %}
-<a href="/page{{ paginator.previous_page }}" title="{{ paginator.previous_page.title }}">&larr; Previous</a>
-{% endif %}
-{% if paginator.next_page %}
-<a href="/page{{ paginator.next_page }}" title="{{ paginator.next_page.title }}">Next &rarr;</a>
-{% endif %}
+<section id="bottomNav">
+	{% if paginator.previous_page %}
+	<a href="/page{{ paginator.previous_page }}" title="{{ paginator.previous_page.title }}">&larr; Previous</a>
+	{% endif %}
+	{% if paginator.next_page %}
+	<a href="/page{{ paginator.next_page }}" title="{{ paginator.next_page.title }}">Next &rarr;</a>
+	{% endif %}
+</section>
