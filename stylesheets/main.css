@@ -3,37 +3,37 @@ body {
 	font-family: 'Baskerville', Georgia, Times, serif;
 	font-size: 20px;
 	line-height: 30px;
-	margin: auto;
-	width: 700px;
 }
-body > header {
-	height: 160px;
+body div#wrapper {
 	background-color: #d8d8d8;
 	width: 700px;
 	border-radius: 5px;
-	margin-bottom: 30px;
+	margin: auto;
+	padding-bottom: 25px;
 }
-body > header a {
+body > div#wrapper > header {
+	height: 100px;
+	margin-bottom: 5px;
+}
+body > div#wrapper > header a {
 	text-decoration: none;
 	color: black;
 }
-.post {
-	padding: 15px;
-	width: 700px;
+section#content {
+	width: 650px;
+	margin: auto;
+	background-color: white;
+	border-radius: 5px;
 }
 img#logo {
 	float: left;
-	padding-left: 50px;
+	margin-left: 100px;
 }
 p#logotype {
 	position: absolute;
-	margin-left: 230px;
+	margin-top: 35px;
+	margin-left: 280px;
 	font-size: 48pt;
-}
-p#blogTitleText {
-	position: absolute;
-	margin: 74px 0px 0px 540px;
-	font-size: 24pt;
 }
 #caption {
 	position: absolute;
@@ -48,15 +48,20 @@ p#blogTitleText {
   margin-right: 30px;
 }
 a { color: #b83000; }
+h1 {
+	font-size: 24pt;
+	font-weight: bold;
+}
+h2 { font-size: 18pt; }
 h1 a {
   color: black;
   text-decoration: none;
 }
 a:hover { text-decoration: underline; }
+.post { padding: 25px; }
 .post header { margin-bottom: 10px; }
 .post .body p:first-child { margin-top: 0; }
 .post .body p:last-child { margin-bottom: 0; }
-.post { margin-bottom: 30px; }
 .post:last-child { margin-bottom: 10px; }
 .post p { margin: 10px 0; }
 .post .more {
