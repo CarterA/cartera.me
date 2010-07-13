@@ -1,6 +1,7 @@
 ---
 title: The Correct Opinion - Code Formatting
 layout: post
+syntax-highlighting: yes
 ---
 
 There are several rules I follow when formatting my code, and I'd like to pass them on to you:  take them or leave them. Just keep in mind that this is, in fact, the correct opinion.~  
