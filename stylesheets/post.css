@@ -1,7 +1,10 @@
-.post { padding: 25px; }
+.post {
+	display: block;
+	padding: 25px;
+}
 .post header { margin-bottom: 10px; }
-.post .body p:first-child { margin-top: 0; }
-.post .body p:last-child { margin-bottom: 0; }
+.post .content p:first-child { margin-top: 0; }
+.post .content p:last-child { margin-bottom: 0; }
 .post:last-child { margin-bottom: 10px; }
 .post p { margin: 10px 0; }
 .post .more {

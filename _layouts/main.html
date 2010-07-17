@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en">
+<html lang="en" class="no-js">
 	<head>
 		<meta charset="utf-8">
 		<link rel="stylesheet" href="/stylesheets/main.css">
@@ -11,6 +11,7 @@
 		{% endif %}
 		<link rel="alternate" type="application/atom+xml" title="<%= title %> - feed" href="/index.xml">
 		<title>{{ page.title }}</title>
+		<script src="/scripts/modernizr.js"></script>
 		<script src="/scripts/jquery.js"></script>
 		<script src="/scripts/main.js"></script>
 	</head>
@@ -30,9 +31,7 @@
 				  </ul>
 				</nav>
 			</header>
-			<section id ="content">
-				{{ content }}
-			</section>
+			<section id ="content">{{ content }}</section>
 			<footer>
 			</footer>
 		</div>

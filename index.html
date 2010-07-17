@@ -10,7 +10,7 @@ stylesheet: post.css
 		<span class="date">{{ post.date | date_to_string }}</span>
 	</header>
 	<section class="content">
-		{{ post.content | truncatewords: 100 }}
+		<blockquote>{{ post.content | truncatewords: 100 }}</blockquote>
 	</section>
 	<div class="more"><a href="{{ post.url }}">read on &raquo;</a></div>
 </article>
