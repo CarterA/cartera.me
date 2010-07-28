@@ -72,6 +72,8 @@ p#logotype {
 	margin-top: 35px;
 	margin-left: 280px;
 	font-size: 48pt;
+	text-decoration: none;
+	display: block;
 }
 a { color: #b83000; }
 h1 {
