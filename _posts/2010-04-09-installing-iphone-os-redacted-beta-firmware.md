@@ -1,5 +1,5 @@
 ---
-title: Installing iPhone OS [REDACTED] Beta Firmware
+title: Installing iOS Beta Firmwares
 layout: post
 --- 
 

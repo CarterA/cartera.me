@@ -3,6 +3,14 @@
 	padding: 25px;
 }
 .post header { margin-bottom: 10px; }
+.post header span.date {
+	float:right;
+	margin-right: 20px;
+}
+.post .content {
+	font-size: 12pt;
+	font-family: 'Georgia', Georgia, Times, serif;
+}
 .post .content p:first-child { margin-top: 0; }
 .post .content p:last-child { margin-bottom: 0; }
 .post:last-child { margin-bottom: 10px; }
