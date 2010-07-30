@@ -1,6 +1,6 @@
 div.vcard {
 	margin: auto;
-	padding: 20px 0px 0px 20px;
+	padding: 0px 0px 0px 20px;
 	width: 375px;
 	height: 170px;
 }
@@ -24,11 +24,6 @@ div.vcard div#links a {
 	height: 26px;
 	margin-left: 4px;
 	float: left;
-	text-indent: -1000px;
-}
-div.vcard div#links a:hover {
-	background-color: #7f7f7f;
-	border-radius: 2px;
 }
 div.vcard div#links a.email {
 	margin-left: 0px;
@@ -36,3 +31,10 @@ div.vcard div#links a.email {
 }
 div.vcard div#links a#aim { background: url(../images/icons/aim.png) 1px 1px no-repeat; }
 div.vcard div#links a#skype { background: url(../images/icons/skype.png) 1px 1px no-repeat; }
+div.vcard div#links a#ember { background: url(../images/icons/ember.png) 1px 1px no-repeat; }
+div.vcard div#links a#flickr { background: url(../images/icons/flickr.png) 1px 1px no-repeat; }
+div.vcard div#links a#google { background: url(../images/icons/google.png) 1px 1px no-repeat; }
+div.vcard div#links a#lastfm { background: url(../images/icons/lastfm.png) 1px 1px no-repeat; }
+div.vcard div#links a#linkedin { background: url(../images/icons/linkedin.png) 1px 1px no-repeat; }
+div.vcard div#links a#vimeo { background: url(../images/icons/vimeo.png) 1px 1px no-repeat; }
+div.vcard div#links a#youtube { background: url(../images/icons/youtube.png) 1px 1px no-repeat; }

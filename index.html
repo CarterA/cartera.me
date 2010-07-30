@@ -1,7 +1,8 @@
 ---
 layout: main
-title: Carter Allen - Articles
-stylesheet: post.css
+title: Articles
+stylesheets: [post.css]
+syntax-highlighting: yes
 ---
 {% for post in paginator.posts %}
 <article class="post">
@@ -10,10 +11,11 @@ stylesheet: post.css
 		<span class="date">{{ post.date | date_to_string }}</span>
 	</header>
 	<section class="content">
-		<blockquote>{{ post.content | truncatewords: 100 }}</blockquote>
+		<blockquote>{{ post.content }}</blockquote>
 	</section>
-	<div class="more"><a href="{{ post.url }}">read on &raquo;</a></div>
+	<p class="more"><a href="{{ post.url }}">Continue reading&#8230;</a></p>
 </article>
+<p class="divider">~</p>
 {% endfor %}
 <section id="bottomNav">
 	{% if paginator.previous_page %}

@@ -1,4 +1,3 @@
-html { margin: 20px; }
 body {
 	/*font-family: 'Baskerville', Georgia, Times, serif;*/
 	font-family: "Gill Sans", "Gill Sans MT", "Gill Sans MS", Helvetica, Sans-Serif;
@@ -12,7 +11,7 @@ body div#wrapper {
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	behavior: url(/stylesheets/PIE.htc);
-	margin: auto;
+	margin: 0px auto;
 	padding-bottom: 25px;
 	display: block;
 }
@@ -27,7 +26,7 @@ body > div#wrapper > header a {
 }
 section#content {
 	width: 650px;
-	margin: auto;
+	margin: 0px auto;
 	display: block;
 	background-color: white;
 	-moz-border-radius: 5px;
@@ -37,11 +36,18 @@ section#content {
 	-moz-box-shadow: inset 0 0 8px black;
 	-webkit-box-shadow: inset 0 0 8px black;
 	behavior: url(/stylesheets/PIE.htc);
+	padding-top: 20px;
+}
+p.divider {
+	font-family: 'Georgia', Georgia, Times, serif;
+	color: #e6e6e6;
+	font-size: 32pt;
+	text-align: center;
 }
 nav {
 	position: absolute;
 	display: block;
-	margin: 105px auto auto 120px;
+	margin: 105px auto 0px 120px;
 	float: left;
 	background-color: white;
 	padding-left: 2em;
@@ -76,7 +82,13 @@ p#logotype {
 	text-decoration: none;
 	display: block;
 }
-a { color: #b83000; }
+a {
+	color: #b83000;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
 h1 {
 	font-size: 20pt;
 	font-weight: bold;

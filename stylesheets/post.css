@@ -1,6 +1,6 @@
 .post {
 	display: block;
-	padding: 25px;
+	padding: 0px 25px;
 }
 .post header { margin-bottom: 10px; }
 .post header span.date {
@@ -16,7 +16,7 @@
 .post:last-child { margin-bottom: 10px; }
 .post p { margin: 10px 0; }
 .post .more {
-	margin: -10px 30px 0px 0px;
+	margin: 10px 30px 0px 0px;
 	font-style: italic;
 	text-align: right;
 }
