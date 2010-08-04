@@ -20,7 +20,7 @@ end
 
 desc 'Build, deploy, then clean.'
 task :deploy => :build do
-  sh 'rsync -rtzh --progress --delete _site/ opt6@opt-6.com:~/new.opt-6.com/'
+  sh 'rsync -rtzh --progress --delete _site/ carterallen@cartera.me~/cartera.me/'
   Rake::Task['clean'].execute
 end
 
