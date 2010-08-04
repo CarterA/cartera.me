@@ -60,6 +60,8 @@ nav ul {
 	margin: 0;
 	padding: 0;
 	text-align: center;
+	list-style-type: none;
+	list-style-image: none;
 }
 nav li {
 	display: inline;
@@ -76,9 +78,10 @@ img#logo {
 img { border-width: 0px; }
 p#logotype {
 	position: absolute;
-	margin-top: 35px;
+	margin-top: 20px;
 	margin-left: 290px;
 	font-size: 44pt;
+	line-height: 44pt;
 	text-decoration: none;
 	display: block;
 }

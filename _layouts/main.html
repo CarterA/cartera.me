@@ -8,8 +8,47 @@
 		<link rel="alternate" type="application/atom+xml" title="Carter Allen - Feed" href="/atom.xml">
 		<title>Carter Allen - {{ page.title }}</title>
 		<script src="/scripts/modernizr.js"></script>
+		<!--[if lte IE 6]>
 		<script src="/scripts/jquery.js"></script>
 		<script src="/scripts/main.js"></script>
+		<![endif]-->
+		<!--[if lte IE 7]>
+		<style>
+			p#logotype {
+				margin-left: 0px;
+			}
+			nav {
+				margin-left: -165px;
+			}
+		</style
+		<![endif]-->
+		<!--[if lte IE 6]>
+		<style>
+			p#logotype {
+				position: relative;
+				display: inline;
+			}
+			img#logo {
+				margin: 0px;
+			}
+			nav {
+				position: relative;
+				display: inline;
+				margin: 0px;
+			}
+			#wrapper {
+				background-color: #d8d8d8;
+				width: 700px;
+				-moz-border-radius: 5px;
+				-webkit-border-radius: 5px;
+				border-radius: 5px;
+				behavior: url(/stylesheets/PIE.htc);
+				margin: 0px auto;
+				padding-bottom: 25px;
+				display: inline;
+			}
+		</style
+		<![endif]-->
 	</head>
 	<body>
 		<div id="wrapper">

@@ -11,7 +11,7 @@ syntax-highlighting: yes
 		<span class="date">{{ post.date | date_to_string }}</span>
 	</header>
 	<section class="content">
-		<blockquote>{{ post.content }}</blockquote>
+		{{ post.content }}
 	</section>
 	<p class="more"><a href="{{ post.url }}">Continue reading&#8230;</a></p>
 </article>
