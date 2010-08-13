@@ -1,4 +1,4 @@
-# Adopted from Tate Johnsons's Rakefile
+# Adopted from Tate Johnson's Rakefile
 # http://github.com/tatey/tatey.com/blob/master/Rakefile
 
 task :default => :server
@@ -27,4 +27,26 @@ end
 def jekyll(opts = '')
   Rake::Task['clean'].execute
   sh 'jekyll ' + opts
+end
+
+task :new do
+	title = ask("Title: ")
+	fileName = ask("Filename: ")
+	article = {"title" => title, "layout" => "post"}.to_yaml
+	article << "---"
+	path = "_posts/#{Time.now.strftime("%Y-%m-%d")}#{'-' + fileName}.md"
+	unless File.exist?(path)
+		File.open(path, "w") do |file| 
+			file.write article
+			sh "mate " + path
+		end
+    	puts "A new article was created at #{path}."
+	else
+    	puts "There was an error creating the article, #{path} already exists."
+	end
+end
+
+def ask message
+  print message
+  STDIN.gets.chomp
 end

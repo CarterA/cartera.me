@@ -1,6 +1,6 @@
 $(document).ready(function(){
 	// Toggle overflow on code blocks.
-	$('pre').hover(function(){
+	$("pre").hover(function(){
 	    $(this).addClass('overflow_visible_hover');
 	}, function(){
 	    $(this).removeClass('overflow_visible_hover');

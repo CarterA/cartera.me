@@ -1,0 +1,21 @@
+p#logotype {
+	position: relative;
+	display: inline;
+}
+img#logo { margin: 0px; }
+nav {
+	position: relative;
+	display: inline;
+	margin: 0px;
+}
+#wrapper {
+	background-color: #d8d8d8;
+	width: 700px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	behavior: url(/stylesheets/PIE.htc);
+	margin: 0px auto;
+	padding-bottom: 25px;
+	display: inline;
+}

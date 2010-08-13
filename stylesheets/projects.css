@@ -1,24 +1,18 @@
-section#projects {
+#projects {
 	padding: 0px 20px 10px 20px;
 }
-section.project {
+.project {
 	margin: 0px 0px 20px 0px;
 	padding: 0px;
 	display: block;
 }
-section.project p {
+.project p {
 	margin: 0px;
 	font-size: 12pt;
 	font-family: 'Georgia', Georgia, Times, serif;
 	line-height: 1.2em;
 	margin-left: 100px;
 }
-/*section.project p.link {
-	margin-top: 1em;
-	margin-right: 5px;
-	text-align: right;
-	font-style: italic;
-}*/
 img {
 	float: left;
 	clear: left;

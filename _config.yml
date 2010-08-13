@@ -1,6 +1,5 @@
 ---
-exclude: ['Rakefile.rb', 'Readme.md', 'psds', 'psds']
-growl: true
+exclude: ['Rakefile.rb', 'Readme.md', 'psds']
 paginate: 5
 markdown: rdiscount
 permalink: pretty
