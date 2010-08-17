@@ -21,28 +21,29 @@ input, select { vertical-align:middle; }
 h1, h2, h3, h4 { margin: 0; display:inline; }
 /* End Reset CSS */
 
-html { overflow-y: scroll; }
+html {
+	background-color: #fff;
+	overflow-y: scroll;
+}
 body {
 	font-family: "Gill Sans", "Gill Sans MT", "Gill Sans MS", Helvetica, Sans-Serif;
 	font-size: 20px;
 	line-height: 30px;
 	-webkit-font-smoothing: antialiased;
-}
-#wrapper {
 	background-color: #d8d8d8;
 	width: 700px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	behavior: url(/stylesheets/PIE.htc);
-	margin: 0px auto;
+	margin: 20px auto;
 	padding-bottom: 25px;
 }
-#wrapper > header {
+body > header {
 	height: 140px;
 	margin-bottom: 5px;
 }
-#wrapper > header a {
+body > header a {
 	text-decoration: none;
 	color: black;
 }
