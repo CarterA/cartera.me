@@ -85,7 +85,9 @@ end
 
 Though it's a bit more complicated than the last few tasks, it's still fairly straightforward. It starts by prompting for a title and a file name. It uses those to generate the metadata of the file, and then creates the post file based on the current date. Finally, it sends the path to `mate` (which opens the file in TextMate) so that I can start writing the post body.  
 
-If you'd like to see the actual Rakefile, you can checkout the latest copy of it [on GitHub](http://github.com/CarterA/cartera.me/blob/master/Rakefile.rb).
+If you'd like to see the actual Rakefile, you can checkout the latest copy of it [on GitHub](http://github.com/CarterA/cartera.me/blob/master/Rakefile.rb).  
+
+Update 8/22/10:  I've improved the Rake tasks that I use, and written about them in more depth [here](/2010/08/22/streamlined-yard-work/).
 
 ## A Cavalcade of Cascading Styles ##
 
