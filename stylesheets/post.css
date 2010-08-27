@@ -11,10 +11,13 @@
 	font-size: 12pt;
 	font-family: 'Georgia', Georgia, Times, serif;
 }
-.more {
-	margin: 10px 30px 0px 0px;
+.continue-reading {
+	margin: 0px 25px 0px 0px;
+	padding: 0px;
+	line-height: 1.0em;
+	font-size: 16px;
 	font-style: italic;
 	text-align: right;
 }
-.more a { text-decoration: none; }
-.more a:hover { text-decoration: underline }
+.continue-reading a { text-decoration: none; }
+.continue-reading a:hover { text-decoration: underline }

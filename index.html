@@ -11,8 +11,9 @@ syntax-highlighting: yes
 		<span class="date">{{ post.date | date_to_string }}</span>
 	</header>
 	<section class="post-content">
-		{{ post.content }}
+		{{ post.content | truncateToFirstParagraph | closeHTMLTags }}
 	</section>
+	<p class="continue-reading"><a href="{{ post.url }}">Continue reading &raquo;</a></p>
 </article>
 <p class="divider">~</p>
 {% endfor %}
