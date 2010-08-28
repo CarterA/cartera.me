@@ -1,5 +1,9 @@
-pre { overflow:hidden; }
-pre.overflow_visible_hover, pre.overflow_visible_sticky { overflow: visible; }
+code { font-family: "Anonymous Pro", "Bitstream Vera Sans", "Monaco", Courier, mono; }
+pre {
+	padding: 20px;
+	overflow: hidden;
+}
+pre:hover { overflow-x: scroll; }
 .highlight .hll { background-color: #ffffcc }
 .highlight  { background: #ffffff; }
 .highlight .c { color: #606060; font-style: italic } /* Comment */
