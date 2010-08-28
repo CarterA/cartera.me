@@ -122,7 +122,11 @@ h1 a {
 }
 a:hover { text-decoration: underline; }
 code { font-family: "Anonymous Pro", "Bitstream Vera Sans", "Monaco", Courier, mono; }
-pre { padding: 20px; }
+pre {
+	padding: 20px;
+	overflow: hidden;
+}
+pre:hover { overflow-x: scroll; }
 blockquote { font-style: italic; }
 footer {
 	text-align: center;
