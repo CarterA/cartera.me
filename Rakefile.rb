@@ -14,8 +14,12 @@ task :default => :develop
  
 desc 'Build site with Jekyll.'
 task :build do
+	buildSite()
+end
+
+def buildSite(mode = "development")
 	printHeader "Compiling website..."
-	options = Jekyll.configuration({})
+	options = Jekyll.configuration({ "mode" => mode })
 	@site = Jekyll::Site.new(options)
 	@site.process
 end
@@ -63,7 +67,8 @@ task :clean do
 end
 
 desc 'Build, deploy, then clean.'
-task :deploy => :build do
+task :deploy do
+	buildSite("deployment")
 	printHeader "Deploying website to http://cartera.me/"
 	sh 'rsync -rtzh _site/ carterallen@cartera.me:~/cartera.me/'
 	Rake::Task['clean'].execute
