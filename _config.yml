@@ -4,6 +4,7 @@ paginate: 5
 markdown: rdiscount
 permalink: pretty
 pygments: true
+version_controlled_files: ["scripts/modernizr-1.5.min.js"]
 projects:
     - name: "Opt-6 Products, LLC"
       logo: "opt-6.png"
