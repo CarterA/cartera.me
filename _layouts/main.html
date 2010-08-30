@@ -25,9 +25,18 @@
 		{% include_stylesheet syntax-highlighting.css %}{% endif %}
 		
 		{% include_script modernizr-1.5.min.js %}
-		
+		<script>
+			function loadMint() {
+				var head= document.getElementsByTagName('head')[0];
+				var script= document.createElement('script');
+				script.type= 'text/javascript';
+				script.src= '/mint/?js';
+				head.appendChild(script);
+			}
+			window.load = loadMint;
+		</script>
 	</head>
-	<body>
+	<body onload="loadMint()">
 		<header>
 			<a href="/">
 				<img id="logo" src="/images/hat.png" width=160 height=100>
@@ -47,6 +56,5 @@
 			<p>Site revision <a href="http://github.com/CarterA/cartera.me/tree/{% commit_hash %}">{% commit_hash %}</a>. Valid <a href="http://validator.w3.org/check?uri=referer" target="_blank">HTML5</a>.</p>
 			<p>Copyright 2010 Carter Allen</p>
 		</footer>
-		{% if site.mode == "deployment" %}<script src="/mint/?js" type="text/javascript"></script>{% endif %}
 	</body>
 </html>
