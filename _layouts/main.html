@@ -23,18 +23,7 @@
 		<!--[if lte IE 6]>{% include_stylesheet main-ie6.css %}<![endif]-->
 		{% if page.stylesheets != nil %}{% for stylesheet in page.stylesheets %}<link rel="stylesheet" href="{{ stylesheet | include_stylesheet }}">{% endfor %}{% endif %}{% if page.syntax-highlighting %}
 		{% include_stylesheet syntax-highlighting.css %}{% endif %}
-		
-		{% include_script modernizr-1.5.min.js %}
-		<script>
-			function loadMint() {
-				var head= document.getElementsByTagName('head')[0];
-				var script= document.createElement('script');
-				script.type= 'text/javascript';
-				script.src= '/mint/?js';
-				head.appendChild(script);
-			}
-			window.onload = loadMint;
-		</script>
+		{% if site.mode == "deployment" %}{% include_script main.js %}{% endif %}
 	</head>
 	<body>
 		<header>
