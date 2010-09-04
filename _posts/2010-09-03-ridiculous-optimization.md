@@ -10,7 +10,7 @@ The first bit of ridiculous optimization is extremely heavy caching of all stati
 
 [View VersionControlledFiles.rb on GitHub.](http://github.com/CarterA/cartera.me/blob/master/_plugins/VersionControlledFiles.rb)  
 
-The second bit of optimization to get rid of [Modernizr](http://modernizr.com/). I know what you're thinking:  *but Carter, your site uses HTML5 and you need Modernizr to enable HTML5 for older browsers, right?*. Wrong. I don't deny that it is an excellent and useful library, but what makes it so big is that it doesn't just enable all sorts of features, it also lets you know which ones are supported. It's the second part that takes a ton of code. I am now using a tiny script that I've had saved in my snippets for a long time (I didn't write it, so if you recognize the source, let me know!):  
+The second bit of optimization was to get rid of [Modernizr](http://modernizr.com/). I know what you're thinking:  *but Carter, your site uses HTML5 and you need Modernizr to enable HTML5 for older browsers, right?*. Wrong. I don't deny that it is an excellent and useful library, but what makes it so big is that it doesn't just enable all sorts of features, it also lets you know which ones are supported. It's the second part that takes a ton of code. I am now using a tiny script that I've had saved in my snippets for a long time (I didn't write it, so if you recognize the source, let me know!):  
 
 {% highlight js %}
 (function(){if(!/*@cc_on!@*/0)return;var e="abbr,article,aside,audio,bb,canvas,datagrid,datalist,details,dialog,eventsource,figure,footer,header,hgroup,mark,menu,meter,nav,output,progress,section,time,video".split(',');for(var i=0;i< e.length;i++){document.createElement(e[i]);}})();
