@@ -30,7 +30,6 @@ module VCFPlugin
 			@stylesheet_name = @stylesheet_name.sub(/#{Regexp.escape(File.extname(@stylesheet_name))}$/, "")
 		end
 		def render(context)
-			puts "StylesheetTag.render"
 			unproccessed_stylesheet_path = "stylesheets/#{@stylesheet_name}#{@original_extension}"
 			processed_stylesheet_path = "/stylesheets/#{@stylesheet_name}.css?revision=#{VCFPlugin::latest_file_revision(unproccessed_stylesheet_path)}"
 			"<link rel=\"stylesheet\" href=\"#{processed_stylesheet_path}\">"
