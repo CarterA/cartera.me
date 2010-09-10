@@ -18,7 +18,7 @@
 		
 		<link rel="alternate" type="application/atom+xml" title="Carter Allen - Feed" href="/atom.xml">
 		
-		{% include_stylesheet main.css %}
+		{% include_stylesheet main.less %}
 		<!--[if lte IE 7]>{% include_stylesheet main-ie7.css %}<![endif]-->
 		<!--[if lte IE 6]>{% include_stylesheet main-ie6.css %}<![endif]-->
 		{% if page.stylesheets != nil %}{% for stylesheet in page.stylesheets %}<link rel="stylesheet" href="{{ stylesheet | include_stylesheet }}">{% endfor %}{% endif %}{% if page.syntax-highlighting %}

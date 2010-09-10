@@ -7,7 +7,9 @@ module VCFPlugin
 		end
 	end
 	def self.latest_file_revision(file_path)
-		%x[git log --pretty=format:%H -1 #{file_path}]
+		result = %x[git log --pretty=format:%H -1 -- #{file_path}]
+		return result unless result == ""
+		return %x[git rev-parse HEAD]
 	end
 	class ScriptTag < Liquid::Tag
 		def initialize(tag_name, script_name, tokens)
@@ -24,25 +26,14 @@ module VCFPlugin
 		def initialize(tag_name, stylesheet_name, tokens)
 			super
 			@stylesheet_name = stylesheet_name.strip
+			@original_extension = File.extname(@stylesheet_name)
+			@stylesheet_name = @stylesheet_name.sub(/#{Regexp.escape(File.extname(@stylesheet_name))}$/, "")
 		end
 		def render(context)
-			unproccessed_stylesheet_path = "stylesheets/#{@stylesheet_name}"
-			processed_stylesheet_path = "/stylesheets/#{@stylesheet_name}?revision=#{VCFPlugin::latest_file_revision(unproccessed_stylesheet_path)}"
+			puts "StylesheetTag.render"
+			unproccessed_stylesheet_path = "stylesheets/#{@stylesheet_name}#{@original_extension}"
+			processed_stylesheet_path = "/stylesheets/#{@stylesheet_name}.css?revision=#{VCFPlugin::latest_file_revision(unproccessed_stylesheet_path)}"
 			"<link rel=\"stylesheet\" href=\"#{processed_stylesheet_path}\">"
-		end
-	end
-	class StylesheetsTag < Liquid::Tag
-		def render(context)
-			puts context.environments.to_s
-			if (!(context["page"].respond_to?("stylesheets")))
-				return
-			end
-			stylesheet_names = context["page"].stylesheets
-			for stylesheet_name in stylesheet_names
-				unprocessed_stylesheet_path = "stylesheets/#{stylesheet_name}"
-				processed_stylesheet_path = "/stylesheets/#{stylesheet_name}?revision=#{VCFPlugin::latest_file_revision(unprocessed_stylesheet_path)}"
-				"<link rel=\"stylesheet\" href=\"#{processed_stylesheet_path}\">"
-			end
 		end
 	end
 end
@@ -50,4 +41,3 @@ end
 Liquid::Template.register_filter(VCFPlugin::LatestFileRevisionFilter)
 Liquid::Template.register_tag("include_script", VCFPlugin::ScriptTag)
 Liquid::Template.register_tag("include_stylesheet", VCFPlugin::StylesheetTag)
-Liquid::Template.register_tag("include_stylesheets", VCFPlugin::StylesheetsTag)
