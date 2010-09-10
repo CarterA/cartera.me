@@ -18,7 +18,7 @@ module Jekyll
 			temporary_file = Tempfile.new("lessjstemp")
 			temporary_file << content
 			temporary_file.flush
-			if @config["mode"].eql?("development")
+			if @config["mode"].eql?("deployment")
 				result = %x[lessc -O2 #{temporary_file.path}]
 				css_compressor = YUI::CssCompressor.new
 				result = css_compressor.compress(result)
