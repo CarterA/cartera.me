@@ -2,33 +2,25 @@ require "yui/compressor"
 
 module Jekyll
 	
-	class LessConverter < Converter
-	
+	class LessGenerator < Generator
+		
 		safe true
-
-		def matches(ext)
-			ext =~ /less/i
-		end
-
-		def output_ext(ext)
-			".css"
-		end
-
-		def convert(content)
-			temporary_file = Tempfile.new("lessjstemp")
-			temporary_file << content
-			temporary_file.flush
-			if @config["mode"].eql?("deployment")
-				result = %x[lessc -O2 #{temporary_file.path}]
-				css_compressor = YUI::CssCompressor.new
-				result = css_compressor.compress(result)
-			else
-				result = %x[lessc #{temporary_file.path}]
+		
+		def generate(site)
+			stylesheets_directory = site.source + "/stylesheets"
+			Dir[site.source + "/stylesheets/**/*.less"].each do |stylesheet|
+				output_path = site.dest + "/stylesheets/" + File.basename(stylesheet, ".less") + ".css"
+				%x[lessc -O2 #{stylesheet} #{output_path}]
+				if site.config["mode"].eql?("deployment")
+					output_file = File.new(output_path, "r")
+					css_compressor = YUI::CssCompressor.new
+					compressed_output = css_compressor.compress(output_file)
+					new_output_file = File.new(output_path, "w")
+					new_output_file.write(compressed_output)
+				end
 			end
-			temporary_file.close
-			result
 		end
-
+		
 	end
 
 end
