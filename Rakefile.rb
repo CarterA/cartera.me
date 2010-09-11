@@ -20,6 +20,7 @@ end
 def buildSite(mode = "development")
 	printHeader "Compiling website..."
 	options = Jekyll.configuration({ "mode" => mode })
+	options["pygments"] = false if mode == "development"
 	@site = Jekyll::Site.new(options)
 	@site.process
 end
