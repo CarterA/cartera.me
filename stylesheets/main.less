@@ -7,8 +7,7 @@
 article, aside, figure, footer, header, hgroup, nav, section { display:block; }
 nav ul { list-style:none; }
 blockquote, q { quotes:none; }
-blockquote:before, blockquote:after,
-q:before, q:after { content:''; content:none; }
+blockquote:before, blockquote:after, q:before, q:after { content:''; content:none; }
 a { margin:0; padding:0; font-size:100%; vertical-align:baseline; background:transparent; }
 h1, h2, h3, h4 { margin: 0; display:inline; }
 /* End Reset CSS */
@@ -43,37 +42,35 @@ html {
 	overflow-y: scroll;
 }
 body {
-	font-family: "Gill Sans", "Gill Sans MT", "Gill Sans MS", Helvetica, Sans-Serif;
-	font-size: 20px;
-	line-height: 30px;
+	font: 20px/1.35em "Gill Sans", "Gill Sans MT", "Gill Sans MS", Helvetica, Sans-Serif;
 	background-color: #d8d8d8;
 	width: 700px;
 	.border-radius(5px);
 	margin: 20px auto;
-	padding-bottom: 3px;
+	padding: 0px 0px 3px 0px;
 	.box-shadow(0px, 1px, 5px, @shadow-color);
 }
 body > header {
 	height: 140px;
-	margin-bottom: 5px;
-}
-body > header a {
-	text-decoration: none;
-	color: black;
+	margin: 0px 0px 5px 0px;
+	a {
+		text-decoration: none;
+		color: black;
+	}
 }
 #content {
 	width: 650px;
 	margin: 0px auto;
+	padding: 20px 0px 0px 0px;
 	background-color: white;
 	.border-radius(5px);
 	.inset-box-shadow(0px, 1px, 5px, @shadow-color);
-	padding-top: 20px;
 }
 .divider {
 	margin: 25px;
 	font-family: 'Georgia', Georgia, Times, serif;
 	color: #e6e6e6;
-	font-size: 32pt;
+	font-size: 40px;
 	text-align: center;
 }
 nav {
@@ -81,20 +78,18 @@ nav {
 	display: block;
 	margin: 105px auto 0px 120px;
 	float: left;
-	background-color: white;
-	padding-left: 2em;
+	background: white;
+	padding: 0em 0em 0em 2em;
 	.border-radius(5px);
-}
-nav ul {
-	margin: 0;
-	padding: 0;
-	text-align: center;
-	list-style-type: none;
-	list-style-image: none;
-}
-nav li {
-	display: inline;
-	padding-right: 2em;
+	ul {
+		margin: 0px;
+		padding: 0px;
+		text-align: center;
+	}
+	li {
+		display: inline;
+		padding-right: 2em;
+	}
 }
 #bottomNav {
 	padding: 0px 0px 25px 25px;
@@ -107,41 +102,31 @@ nav li {
 img { border-width: 0px; }
 #logotype {
 	position: absolute;
-	margin-top: 20px;
-	margin-left: 290px;
-	font-size: 44pt;
-	line-height: 44pt;
-	text-decoration: none;
+	margin: 20px 0px 0px 290px;
+	font-size: 60px;
+	line-height: 1.0em;
 	display: block;
 }
 a {
 	color: #b83000;
 	text-decoration: none;
 }
-a:hover {
-	text-decoration: underline;
-}
+a:hover { text-decoration: underline; }
 h1 {
 	font-size: 18px;
 	line-height: 1em;
+	a {
+	  color: black;
+	  text-decoration: none;
+	}
 }
 h2 { font-size: 16px; }
-h1 a {
-  color: black;
-  text-decoration: none;
-}
-a:hover { text-decoration: underline; }
 blockquote { font-style: italic; }
 footer {
 	text-align: center;
 	font-size: 11px;
 	line-height: 0.75em;
-	padding: 0;
-	margin: 0;
-	color: #888;
-}
-.centerImage {
-	text-align:center;
+	padding: 0px;
 	margin: 0px;
-	padding:0px;
+	color: #888;
 }
