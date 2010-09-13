@@ -1,13 +1,10 @@
----
----
 /* 
 	html5doctor.com Reset Stylesheet (Eric Meyer's Reset Reloaded + HTML5 baseline)
 	v1.4 2009-07-27 | Authors: Eric Meyer & Richard Clark
 	html5doctor.com/html-5-reset-stylesheet/
 	Modified for personal use by Carter Allen.
 */
-article, aside, figure, footer, header, 
-hgroup, nav, section { display:block; }
+article, aside, figure, footer, header, hgroup, nav, section { display:block; }
 nav ul { list-style:none; }
 blockquote, q { quotes:none; }
 blockquote:before, blockquote:after,
@@ -16,23 +13,44 @@ a { margin:0; padding:0; font-size:100%; vertical-align:baseline; background:tra
 h1, h2, h3, h4 { margin: 0; display:inline; }
 /* End Reset CSS */
 
+@import "mixins";
+
+@pinstripe-color: #323232;
+@shadow-color: black;
+
 html {
-	background-color: #fff;
+	background-color: #646464;
+	background-image:
+	-webkit-gradient(linear, 100% 0%, 0% 100%,
+		from(transparent),
+		color-stop(0.15, transparent),
+		color-stop(0.15, @pinstripe-color),
+		color-stop(0.50, @pinstripe-color),
+		color-stop(0.50, transparent),
+		color-stop(0.65, transparent),
+		color-stop(0.65, @pinstripe-color),
+		to(@pinstripe-color));
+	background-image:
+	-moz-linear-gradient(100% 0%, 
+		transparent 0.15,
+		@pinstripe-color 0.15,
+		@pinstripe-color 0.50,
+		transparent 0.50,
+		transparent 0.65,
+		@pinstripe-color 0.65);
+	.background-size(60px, 60px);
 	overflow-y: scroll;
 }
 body {
 	font-family: "Gill Sans", "Gill Sans MT", "Gill Sans MS", Helvetica, Sans-Serif;
 	font-size: 20px;
 	line-height: 30px;
-	-webkit-font-smoothing: antialiased;
 	background-color: #d8d8d8;
 	width: 700px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	behavior: url(/stylesheets/PIE.htc);
+	.border-radius(5px);
 	margin: 20px auto;
 	padding-bottom: 3px;
+	.box-shadow(0px, 1px, 5px, @shadow-color);
 }
 body > header {
 	height: 140px;
@@ -46,16 +64,12 @@ body > header a {
 	width: 650px;
 	margin: 0px auto;
 	background-color: white;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	box-shadow: inset 0 0 8px black;
-	-moz-box-shadow: inset 0 0 8px black;
-	-webkit-box-shadow: inset 0 0 8px black;
-	behavior: url(/stylesheets/PIE.htc);
+	.border-radius(5px);
+	.inset-box-shadow(0px, 1px, 5px, @shadow-color);
 	padding-top: 20px;
 }
 .divider {
+	margin: 25px;
 	font-family: 'Georgia', Georgia, Times, serif;
 	color: #e6e6e6;
 	font-size: 32pt;
@@ -68,10 +82,7 @@ nav {
 	float: left;
 	background-color: white;
 	padding-left: 2em;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	behavior: url(/stylesheets/PIE.htc);
+	.border-radius(5px);
 }
 nav ul {
 	margin: 0;
@@ -109,8 +120,11 @@ a {
 a:hover {
 	text-decoration: underline;
 }
-h1 { font-size: 20pt; }
-h2 { font-size: 16pt; }
+h1 {
+	font-size: 18px;
+	line-height: 1em;
+}
+h2 { font-size: 16px; }
 h1 a {
   color: black;
   text-decoration: none;

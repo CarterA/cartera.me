@@ -4,10 +4,11 @@
 	display: block;
 	padding: 0px 25px;
 }
-.post-header { margin-bottom: 10px; }
+.post-header { margin-bottom: -15px; }
 .date {
 	float:right;
 	margin-right: 20px;
+	font-size: 14px;
 }
 .post-content {
 	font-size: 12pt;

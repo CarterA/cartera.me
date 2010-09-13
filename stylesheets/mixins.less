@@ -1,0 +1,23 @@
+.border-radius(@radius) {
+	-moz-border-radius: @radius;
+	-webkit-border-radius: @radius;
+	border-radius: @radius;
+	behavior: url(/stylesheets/PIE.htc);
+}
+.box-shadow(@x-offset, @y-offset, @blur, @color) {
+	box-shadow: @x-offset @y-offset @blur @color;
+	-moz-box-shadow: @x-offset @y-offset @blur @color;
+	-webkit-box-shadow: @x-offset @y-offset @blur @color;
+	behavior: url(/stylesheets/PIE.htc);
+}
+.inset-box-shadow(@x-offset, @y-offset, @blur, @color) {
+	box-shadow: inset @x-offset @y-offset @blur @color;
+	-moz-box-shadow: inset @x-offset @y-offset @blur @color;
+	-webkit-box-shadow: inset @x-offset @y-offset @blur @color;
+	behavior: url(/stylesheets/PIE.htc);
+}
+.background-size(@x, @y) {
+	-webkit-background-size: @x @y;
+	-moz-background-size: @x @y;
+	background-size: @x @y;
+}
