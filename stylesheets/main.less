@@ -16,9 +16,14 @@ h1, h2, h3, h4 { margin: 0; display:inline; }
 
 @pinstripe-color: #323232;
 @shadow-color: black;
+@page-background-color: #646464;
+@container-background-color: #d8d8d8;
+@container-width: 700px;
+@standard-border-radius: 5px;
+@trim-color: #b83000;
 
 html {
-	background-color: #646464;
+	background-color: @page-background-color;
 	background-image:
 	-webkit-gradient(linear, 100% 0%, 0% 100%,
 		from(transparent),
@@ -30,22 +35,23 @@ html {
 		color-stop(0.65, @pinstripe-color),
 		to(@pinstripe-color));
 	background-image:
-	-moz-linear-gradient(100% 0%, 
-		transparent 0.15,
-		@pinstripe-color 0.15,
-		@pinstripe-color 0.50,
-		transparent 0.50,
-		transparent 0.65,
-		@pinstripe-color 0.65);
+	-moz-linear-gradient(top right,
+		transparent 15%,
+		@pinstripe-color 15%,
+		@pinstripe-color 50%,
+		transparent 50%,
+		transparent 65%,
+		@pinstripe-color 65%,
+		@pinstripe-color 100%);
 	.background-size(60px, 60px);
 	background-attachment: fixed;
 	overflow-y: scroll;
 }
 body {
 	font: 20px/1.35em "Gill Sans", "Gill Sans MT", "Gill Sans MS", Helvetica, Sans-Serif;
-	background-color: #d8d8d8;
-	width: 700px;
-	.border-radius(5px);
+	background-color: @container-background-color;
+	width: @container-width;
+	.border-radius(@standard-border-radius);
 	margin: 20px auto;
 	padding: 0px 0px 3px 0px;
 	.box-shadow(0px, 1px, 5px, @shadow-color);
@@ -59,17 +65,17 @@ body > header {
 	}
 }
 #content {
-	width: 650px;
+	width: @container-width - 50px;
 	margin: 0px auto;
 	padding: 20px 0px 0px 0px;
 	background-color: white;
-	.border-radius(5px);
+	.border-radius(@standard-border-radius);
 	.inset-box-shadow(0px, 1px, 5px, @shadow-color);
 }
 .divider {
 	margin: 25px;
 	font-family: 'Georgia', Georgia, Times, serif;
-	color: #e6e6e6;
+	color: lighten(@trim-color, 55%);
 	font-size: 40px;
 	text-align: center;
 }
@@ -108,7 +114,7 @@ img { border-width: 0px; }
 	display: block;
 }
 a {
-	color: #b83000;
+	color: @trim-color;
 	text-decoration: none;
 }
 a:hover { text-decoration: underline; }
