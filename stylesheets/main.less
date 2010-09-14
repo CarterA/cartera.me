@@ -3,28 +3,7 @@
 @import "configuration";
 
 html {
-	background-color: @page-background-color;
-	background-image:
-	-webkit-gradient(linear, 100% 0%, 0% 100%,
-		from(@page-background-color),
-		color-stop(0.15, @page-background-color),
-		color-stop(0.15, @pinstripe-color),
-		color-stop(0.50, @pinstripe-color),
-		color-stop(0.50, @page-background-color),
-		color-stop(0.65, @page-background-color),
-		color-stop(0.65, @pinstripe-color),
-		to(@pinstripe-color));
-	background-image:
-	-moz-linear-gradient(top right,
-		@page-background-color 15%,
-		@pinstripe-color 15%,
-		@pinstripe-color 50%,
-		@page-background-color 50%,
-		@page-background-color 65%,
-		@pinstripe-color 65%,
-		@pinstripe-color 100%);
-	.background-size(60px, 60px);
-	background-attachment: fixed;
+	background: @page-background-color url(/images/pinstripe.png) repeat fixed;
 	overflow-y: scroll;
 }
 body {
