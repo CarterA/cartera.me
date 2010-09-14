@@ -1,46 +1,26 @@
-/* 
-	html5doctor.com Reset Stylesheet (Eric Meyer's Reset Reloaded + HTML5 baseline)
-	v1.4 2009-07-27 | Authors: Eric Meyer & Richard Clark
-	html5doctor.com/html-5-reset-stylesheet/
-	Modified for personal use by Carter Allen.
-*/
-article, aside, figure, footer, header, hgroup, nav, section { display:block; }
-nav ul { list-style:none; }
-blockquote, q { quotes:none; }
-blockquote:before, blockquote:after, q:before, q:after { content:''; content:none; }
-a { margin:0; padding:0; font-size:100%; vertical-align:baseline; background:transparent; }
-h1, h2, h3, h4 { margin: 0; display:inline; }
-/* End Reset CSS */
-
+@import "reset";
 @import "mixins";
-
-@pinstripe-color: #323232;
-@shadow-color: black;
-@page-background-color: #646464;
-@container-background-color: #d8d8d8;
-@container-width: 700px;
-@standard-border-radius: 5px;
-@trim-color: #b83000;
+@import "configuration";
 
 html {
 	background-color: @page-background-color;
 	background-image:
 	-webkit-gradient(linear, 100% 0%, 0% 100%,
-		from(transparent),
-		color-stop(0.15, transparent),
+		from(@page-background-color),
+		color-stop(0.15, @page-background-color),
 		color-stop(0.15, @pinstripe-color),
 		color-stop(0.50, @pinstripe-color),
-		color-stop(0.50, transparent),
-		color-stop(0.65, transparent),
+		color-stop(0.50, @page-background-color),
+		color-stop(0.65, @page-background-color),
 		color-stop(0.65, @pinstripe-color),
 		to(@pinstripe-color));
 	background-image:
 	-moz-linear-gradient(top right,
-		transparent 15%,
+		@page-background-color 15%,
 		@pinstripe-color 15%,
 		@pinstripe-color 50%,
-		transparent 50%,
-		transparent 65%,
+		@page-background-color 50%,
+		@page-background-color 65%,
 		@pinstripe-color 65%,
 		@pinstripe-color 100%);
 	.background-size(60px, 60px);
@@ -51,7 +31,7 @@ body {
 	font: 20px/1.35em "Gill Sans", "Gill Sans MT", "Gill Sans MS", Helvetica, Sans-Serif;
 	background-color: @container-background-color;
 	width: @container-width;
-	.border-radius(@standard-border-radius);
+	.border-radius(@border-radius);
 	margin: 20px auto;
 	padding: 0px 0px 3px 0px;
 	.box-shadow(0px, 1px, 5px, @shadow-color);
@@ -68,33 +48,30 @@ body > header {
 	width: @container-width - 50px;
 	margin: 0px auto;
 	padding: 20px 0px 0px 0px;
-	background-color: white;
-	.border-radius(@standard-border-radius);
+	background: @content-background-color;
+	.border-radius(@border-radius);
 	.inset-box-shadow(0px, 1px, 5px, @shadow-color);
 }
 .divider {
 	margin: 25px;
-	font-family: 'Georgia', Georgia, Times, serif;
+	font: 40px "Georgia", Georgia, Times, serif;
 	color: lighten(@trim-color, 55%);
-	font-size: 40px;
 	text-align: center;
 }
 nav {
 	position: absolute;
-	display: block;
 	margin: 105px auto 0px 120px;
 	float: left;
-	background: white;
+	background: @nav-background-color;
 	padding: 0em 0em 0em 2em;
 	.border-radius(5px);
 	ul {
-		margin: 0px;
-		padding: 0px;
+		.margin-and-padding(0px);
 		text-align: center;
 	}
 	li {
 		display: inline;
-		padding-right: 2em;
+		padding: 0em 2em 0em 0em;
 	}
 }
 #bottomNav {
@@ -103,14 +80,13 @@ nav {
 }
 #logo {
 	float: left;
-	margin-left: 120px;
+	margin: 0px 0px 0px 120px;
 }
 img { border-width: 0px; }
 #logotype {
 	position: absolute;
 	margin: 20px 0px 0px 290px;
-	font-size: 60px;
-	line-height: 1.0em;
+	.font-size(60px);
 	display: block;
 }
 a {
@@ -119,20 +95,14 @@ a {
 }
 a:hover { text-decoration: underline; }
 h1 {
-	font-size: 18px;
-	line-height: 1em;
-	a {
-	  color: black;
-	  text-decoration: none;
-	}
+	.font-size(18px);
+	a { color: black; }
 }
 h2 { font-size: 16px; }
 blockquote { font-style: italic; }
 footer {
 	text-align: center;
-	font-size: 11px;
-	line-height: 0.75em;
-	padding: 0px;
-	margin: 0px;
-	color: #888;
+	.font-size(@footer-font-size, @footer-line-height);
+	.margin-and-padding(0px);
+	color: @footer-text-color;
 }
