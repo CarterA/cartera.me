@@ -1,22 +1,12 @@
 <!DOCTYPE HTML>
-<!--[if lt IE 7]>  <html class="no-js ie ie6 lte9 lte8 lte7">	<![endif]-->
-<!--[if IE 7]>     <html class="no-js ie ie7 lte9 lte8 lte7">	<![endif]-->
-<!--[if IE 8]>     <html class="no-js ie ie8 lte9 lte8">		<![endif]-->
-<!--[if IE 9]>     <html class="no-js ie ie9 lte9">				<![endif]-->
-<!--[if gt IE 9]>  <html>										<![endif]-->
-<!--[if !IE]><!-->
 <html class="no-js">
-<!--<![endif]-->
 	<head>
 		
 		<meta charset="utf-8">
-		
 		<title>Carter Allen - {{ page.title }}</title>
-		
 		<meta name="description" content="Articles and projects written and created by developer Carter Allen.">
 		<meta name="author" content="Carter Allen">
-		
-		<link rel="alternate" type="application/atom+xml" title="Carter Allen - Feed" href="/atom.xml">
+		<link rel="alternate" type="application/atom+xml" title="Carter Allen - Feed" href="http://feeds.feedburner.com/CarterADotMeBlog?format=xml">
 		
 		{% include_stylesheet main.less %}
 		<!--[if lte IE 7]>{% include_stylesheet main-ie7.css %}<![endif]-->
@@ -24,6 +14,7 @@
 		{% if page.stylesheets != nil %}{% for stylesheet in page.stylesheets %}<link rel="stylesheet" href="{{ stylesheet | include_stylesheet }}">{% endfor %}{% endif %}{% if page.syntax-highlighting %}
 		{% include_stylesheet syntax-highlighting.css %}{% endif %}
 		{% if site.mode == "deployment" %}{% include_script main.js %}{% endif %}
+		
 	</head>
 	<body>
 		<header>

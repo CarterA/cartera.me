@@ -24,6 +24,9 @@ FileETag None
 	AddOutputFilterByType DEFLATE text/html text/plain text/css application/x-javascript text/javascript application/javascript application/json text/xml application/xml text/x-component
 </IfModule>
 
+# Redirect from the old basic atom feed to the FeedBurner feed
+Redirect 301 /atom.xml http://feeds.feedburner.com/CarterADotMeBlog?format=xml
+
 # Redirects from old blog posts to new articles.
 Redirect 301 /blog/writing/holidays/ http://cartera.me/2009/02/20/holidays/
 Redirect 301 /blog/music/ni%d0%b8/ http://cartera.me/2009/05/27/nin/
