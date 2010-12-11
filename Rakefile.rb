@@ -71,7 +71,7 @@ desc 'Build, deploy, then clean.'
 task :deploy do
 	buildSite("deployment")
 	printHeader "Deploying website to http://cartera.me/"
-	sh 'rsync -rtzh _site/ carterallen@cartera.me:~/cartera.me/'
+	sh 'rsync -rtzh _site/ carterallen@zcr.me:~/sites/cartera.me/public/'
 	Rake::Task['clean'].execute
 end
 
