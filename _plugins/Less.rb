@@ -1,26 +1,40 @@
-require "yui/compressor"
+require "less"
 
 module Jekyll
-	
-	class LessGenerator < Generator
-		
-		safe true
-		
-		def generate(site)
-			stylesheets_directory = site.source + "/stylesheets"
-			Dir[site.source + "/stylesheets/**/*.less"].each do |stylesheet|
-				output_path = site.dest + "/stylesheets/" + File.basename(stylesheet, ".less") + ".css"
-				%x[lessc -O2 #{stylesheet} #{output_path}]
-				if site.config["mode"].eql?("deployment")
-					output_file = File.new(output_path, "r")
-					css_compressor = YUI::CssCompressor.new
-					compressed_output = css_compressor.compress(output_file)
-					new_output_file = File.new(output_path, "w")
-					new_output_file.write(compressed_output)
-				end
-			end
-		end
-		
-	end
+  # Compiled LESS CSS into CSS. You must specify an empty YAML front matter
+  # at the beginning of the file.
+  # .less -> .css
+  class LessConverter < Converter
+    pygments_prefix "\n"
+    pygments_suffix "\n"
 
+    def setup
+      return if @setup
+      require 'less'
+      @setup = true
+    rescue LoadError
+      STDERR.puts 'You are missing a library required for less. Please run:'
+      STDERR.puts '  $ [sudo] gem install less'
+      raise FatalException.new("Missing dependency: less")
+    end
+
+    def matches(ext)
+      ext =~ /less/i
+    end
+
+    def output_ext(ext)
+      ".css"
+    end
+
+    def convert(content)
+      setup
+      begin
+		parser = Less::Parser.new :paths => ["./stylesheets"]
+		tree = parser.parse(content)
+		content = tree.to_css(:compress => true)
+      rescue => e
+        puts "Less Exception: #{e.message}"
+      end
+    end
+  end
 end
