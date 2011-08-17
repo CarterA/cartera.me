@@ -3,6 +3,7 @@
 # Some code from the jekyll executable file
 # http://github.com/mojombo/jekyll/blob/master/bin/jekyll
 
+require "bundler/setup"
 require 'webrick'
 require 'directory_watcher'
 require "term/ansicolor"
