@@ -6,9 +6,7 @@
 require "bundler/setup"
 require 'webrick'
 require 'directory_watcher'
-require "term/ansicolor"
 require "jekyll"
-include Term::ANSIColor
 include WEBrick
 
 task :default => :develop
@@ -99,6 +97,6 @@ def ask message
 end
 
 def printHeader headerText
-	print bold + blue + "==> " + reset
-	print bold + headerText + reset + "\n"
+	print "\e[1m" + "\e[34m" + "==> " + "\e[0m" + "\e[0m"
+	print "\e[1m" + headerText + "\e[0m" + "\n"
 end
