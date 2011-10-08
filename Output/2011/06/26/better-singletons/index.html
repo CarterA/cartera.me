@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<!--
+	Well hello there! Feel free to look over the code here, if you'd like.
+	It is worth mentioning that the un-compiled version of the site's code
+	can be found here:  http://github.com/CarterA/cartera.me/
+-->
+<html>
+	<head>
+		
+		<meta charset="utf-8">
+		<title>Carter Allen - Better Singletons in Objective-C</title>
+		<meta name="description" content="Articles and projects written and created by developer Carter Allen.">
+		<meta name="author" content="Carter Allen">
+		<link rel="alternate" type="application/atom+xml" title="Carter Allen - Feed" href="http://feeds.feedburner.com/CarterADotMeBlog?format=xml">
+		<link rel="openid.server" href="http://www.myopenid.com/server" />
+		<link rel="openid.delegate" href="http://carterallen.myopenid.com/" />
+		<link rel="openid2.local_id" href="http://carterallen.myopenid.com" />
+		<link rel="openid2.provider" href="http://www.myopenid.com/server" />
+		
+		<meta name="viewport" content="width=device-width">
+		<link rel="stylesheet" href="/stylesheets/main.css">
+		
+        
+		<link rel="stylesheet" href="/stylesheets/post.css">
+		
+		
+	</head>
+	<body>
+	    <div id="container">
+		<header>
+		    <div class="badtie"></div>
+			<a href="/">
+				<img id="logo" src="/images/hat.png" width=190 height=100>
+				<p id="logotype">carter<b>allen</b></p>
+			</a>
+			<nav>
+			  <ul>
+				<li><a href="/">Articles</a></li>
+				<li><a href="/projects">Projects</a></li>
+				<li><a href="/archives">Archives</a></li>
+				<li><a href="/about/" rel="author">About</a></li>
+			  </ul>
+			</nav>
+		</header>
+		<section id ="content"><!-- Stylesheets: post -->
+<article class="post">
+	<header class="post-header">
+		<h1>Better Singletons in Objective-C</h1>
+		<span class="date">Jun 26, 2011</span>
+	</header>
+	<section class="post-content">
+		<p>Singletons are special classes which have only one valid instance in an entire application or context. They are similar to global variables in that anything that tries to access them will always find itself sending messages to the same actual object as anything else. Singletons are very common in apps that utilize Objective-C. Apple&#39;s often-used singletons include <code>NSFileManager</code> and <code>NSUserDefaults</code>.  </p>
+
+<p>How to implement a singleton object in Objective-C yourself in the most correct way possible is a matter of quite a bit of contention, though it has recently settled down around one particular pattern:  the use of the <code>dispatch_once</code> function to prevent an object from ever being initialized twice. However, there are a few nuances in how these new-age singletons should be implemented, and that&#39;s why I&#39;ve chosen to outline what, in my view, is the &quot;correct&quot; way to implement your own singleton.  </p>
+
+<p>Without further ado, here is my basic implementation of a basic Objective-C singleton:</p>
+
+<script src="https://gist.github.com/1257894.js"></script>
+
+<p>What you may immediately notice if you have ever seen older singleton implementations is that there is only one method here. Many singleton implementations override every possible memory management method (including <code>retain</code>, <code>release</code>, and even more obscure methods such as <code>allocWithZone:</code>) to return the same single instance of the class. This is a Bad Thing™ for a few reasons. First, it&#39;s largely unnecessary. Unless you are writing a framework that will be used by millions of apps, the only person who is going to be using your class is, well, you. Coding defensively is all well and good, but you can definitely go overboard, and overriding all of the memory management methods is decidedly beyond the point of necessity. Second, overriding those important methods of NSObject can lead to undefined behavior, and is an even bigger problem when using the newly-announced <a href="http://clang.llvm.org/docs/AutomaticReferenceCounting.html">Automatic Reference Counting</a> system.  </p>
+
+<p>This new pattern also has a fairly large benefit, which is that while the default behavior of the class is to only create a single instance of itself, it is still entirely possible for the class&#39;s client to create separate instances of the class if the need arises. This is how many of Apple&#39;s singleton classes work, a good example of which is <code>NSUserDefaults</code>. Most of the time your app is using <code>NSUserDefaults</code>, it is completely acceptable to simply use its shared instance, accessed via <code>[NSUserDefaults sharedUserDefaults]</code>. However, some complex behaviors in your application may require customizing the domain of the entire user defaults object. If that situation arises, <code>NSUserDefaults</code> has you covered with its other methods which initialize instances which are entirely separate from the singleton.</p>
+
+	</section>
+	<section class="comments">
+		<div id="disqus_thread"></div>
+		<script src="http://disqus.com/forums/cartera/embed.js"></script>
+		<noscript><a href="http://cartera.disqus.com/?url=ref">View the discussion thread.</a></noscript>
+		<a href="http://disqus.com" class="dsq-brlink">Comments powered by <span class="logo-disqus">Disqus</span></a>
+	</section>
+</article></section>
+		<footer>
+			<p>Site revision <a href="http://github.com/CarterA/cartera.me/tree/"></a>. Valid <a href="http://validator.w3.org/check?uri=referer" target="_blank">HTML5</a>.</p>
+			<p>Copyright 2010 Carter Allen</p>
+			<div class="badtie"></div>
+		</footer>
+		</div>
+	</body>
+</html>

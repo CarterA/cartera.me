@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<!--
+	Well hello there! Feel free to look over the code here, if you'd like.
+	It is worth mentioning that the un-compiled version of the site's code
+	can be found here:  http://github.com/CarterA/cartera.me/
+-->
+<html>
+	<head>
+		
+		<meta charset="utf-8">
+		<title>Carter Allen - Understanding Object-Oriented Programming and the MVC System</title>
+		<meta name="description" content="Articles and projects written and created by developer Carter Allen.">
+		<meta name="author" content="Carter Allen">
+		<link rel="alternate" type="application/atom+xml" title="Carter Allen - Feed" href="http://feeds.feedburner.com/CarterADotMeBlog?format=xml">
+		<link rel="openid.server" href="http://www.myopenid.com/server" />
+		<link rel="openid.delegate" href="http://carterallen.myopenid.com/" />
+		<link rel="openid2.local_id" href="http://carterallen.myopenid.com" />
+		<link rel="openid2.provider" href="http://www.myopenid.com/server" />
+		
+		<meta name="viewport" content="width=device-width">
+		<link rel="stylesheet" href="/stylesheets/main.css">
+		
+        
+		<link rel="stylesheet" href="/stylesheets/post.css">
+		
+		
+	</head>
+	<body>
+	    <div id="container">
+		<header>
+		    <div class="badtie"></div>
+			<a href="/">
+				<img id="logo" src="/images/hat.png" width=190 height=100>
+				<p id="logotype">carter<b>allen</b></p>
+			</a>
+			<nav>
+			  <ul>
+				<li><a href="/">Articles</a></li>
+				<li><a href="/projects">Projects</a></li>
+				<li><a href="/archives">Archives</a></li>
+				<li><a href="/about/" rel="author">About</a></li>
+			  </ul>
+			</nav>
+		</header>
+		<section id ="content"><!-- Stylesheets: post -->
+<article class="post">
+	<header class="post-header">
+		<h1>Understanding Object-Oriented Programming and the MVC System</h1>
+		<span class="date">Apr 15, 2009</span>
+	</header>
+	<section class="post-content">
+		<p><h3>Introduction</h3>
+Before you begin to learn the basic syntax of Cocoa (the API created by Apple for writing desktop Mac applications in Objective-C), you must first gain a firm grasp of the following two concepts:<br />
+&nbsp; a. Object Oriented Programming<br />
+&nbsp; b. The Model-View-Controller System (MVC)<br />
+Object Oriented programming is a way of writing code that allows you to create multiple &quot;objects,&quot; which each have properties, and actions that they can perform. The MVC System provides a basic guideline for organizing a project with multiple classes that each perform specialized tasks.<br />
+<h3>Object Oriented Programming</h3>
+I&#39;m going to go out on a limb here and use a car analogy. Ever model of car has its own blueprint, which the manufacturer uses to build lots of copies of this same type of car. Yet once each car has been created, it is given its own defining features, such as color, drive, and location. The owner can customize their car by doing lots of unique actions to it (painting it a new color, replacing the seats, etc.) But no matter how much the owner customizes their car, it is still based off of the original blueprint that was created by the manufacturer.<br /><br />
+Jump time. The blueprints that the manufacturer used to make lots of copies of this same model of car are now called <em>classes</em>. Each car is now an <em>object</em>, and each <em>object</em> is an <em>instance</em> of the <em>class</em>. All of the little defining features of each car, those are <em>variables</em>. And the little actions that the owner takes to customize the car, those are <em>methods</em>.<br /><br />
+Take a deep breath, that&#39;s a lot to take in in such a short amount of time. Lets go over it again, shall we?<br />
+&nbsp; Class:  A blueprint. A definition of how an object can be created.<br />
+&nbsp; Object:  An instance of a class. In other words, something built from a certain blueprint.<br />
+&nbsp; Instance:  An object that was created using a class as a blueprint. For instance, for the car analogy, a Porsche 911 owned by myself (I wish) would be an <em>instance</em> of the Porsche 911 class.<br />
+&nbsp; Variable:  A property of an object. Something that defines it. In the car analogy, the color of the car would be a variable.<br />
+&amp;nbsp Method:  An action that something can take that changes a variable of an object. Using the car analogy, this is something that a person can do to change the properties of the car.<br /><br />
+So, I know what you&#39;re thinking:  <em>How the hell does this relate to Programming?</em> Well, I&#39;ll give you a real-world example:<br /><br />
+Say I want to have an app that, when it starts up, display a window. <strong>Quick Disclaimer:  This code is BY NO MEANS something that would actually work, so do NOT write to me, telling me that my example doesn&#39;t work. This is just to drive my point home.</strong> To do so, I would send a message to the application telling it to display a window. In this case, the application that I&#39;m sending a message to is the <em>object</em>, and the message I&#39;m sending is what we call the <em>method</em>. Remember, a method is an action you can take on an object. Again, this wouldn&#39;t actually work, but...<br /><br />
+[Application displayWindow];<br /><br />
+Make sense? Good. I&#39;ll go over more of proper Objective-C syntax in a later tutorial, don&#39;t worry.<br /><br />
+I dunno about you, but I am totally ready to move on to MVC!<br /><br />
+<h3>The Model-View-Controller System</h3><br />
+Now you&#39;re thinking:  <em>Crap, this sounds complicated...</em>and it is! Nah, not really. You just have to understand what we&#39;re going for. The idea of MVC is it is simply a way of organizing the way that the User Interface (UI) interacts with the code, and how the code in turn can change things in the UI and respond to the user. To explain, I&#39;m just going to give you a description of each element of MVC (keep in mind, these do not go in the order that they communicate in):<br />
+&nbsp; Model:  The model is the code base of the application. For example, a calculator&#39;s model would be the class that handles operations such as multiplication, division, and more complex things if it was needed. Keep in mind, the model should <em>never</em> interact with the interface or the user directly. This kills the whole system. It <em>can</em>, however, send messages to the controller about what the results of an operation are, and the controller can send orders to it.<br />
+&nbsp; View:  This is the interface that the user interacts with or sees. In our calculator example, this would be the actual window with buttons and a numerical display area. The view can send messages to the controller about what the user is doing, but it cannot talk directly to the model. Again, this kills the whole system.<br />
+&nbsp; Controller:  This is a relay station of sorts. The controller takes actions sent by the view (from the user), and tells the model what to do. The model then sends back whatever data should be displayed to the user, and from there, the controller can tell the view to display it.<br /><br />
+I know this all may seem fairly complicated, but if you look at any well-known open-source Cocoa project, you&#39;ll see that this is the accepted way of organizing your code. You&#39;ll do fine with it as long as you remember that the key is to separate the brains of the application from the interface that the user sees.<br /><br /></p>
+
+<p>This tutorial was written for a new developer tutorial site, which has yet to be officially launched. This post will be updated once it has launched. Until then, please comment and critique! -Carter</p>
+
+	</section>
+	<section class="comments">
+		<div id="disqus_thread"></div>
+		<script src="http://disqus.com/forums/cartera/embed.js"></script>
+		<noscript><a href="http://cartera.disqus.com/?url=ref">View the discussion thread.</a></noscript>
+		<a href="http://disqus.com" class="dsq-brlink">Comments powered by <span class="logo-disqus">Disqus</span></a>
+	</section>
+</article></section>
+		<footer>
+			<p>Site revision <a href="http://github.com/CarterA/cartera.me/tree/"></a>. Valid <a href="http://validator.w3.org/check?uri=referer" target="_blank">HTML5</a>.</p>
+			<p>Copyright 2010 Carter Allen</p>
+			<div class="badtie"></div>
+		</footer>
+		</div>
+	</body>
+</html>

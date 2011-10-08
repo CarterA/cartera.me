@@ -1,0 +1,1240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>Carter Allen</title>
+	<link href="http://cartera.me/feed.xml" rel="self"/>
+	<link href="http://cartera.me/"/>
+	<updated>2011-10-08T16:13:33-06:00</updated>
+	<id>http://cartera.me/</id>
+	<author>
+		<name>Carter Allen</name>
+		<email>Carter@zcr.me</email>
+	</author>
+	
+	<entry>
+		<title>Practical Usage of CoreStorage</title>
+		<link href="http://cartera.me/2011/08/14/practical-corestorage"/>
+		<updated>2011-08-14T06:00:00-06:00</updated>
+		<id>http://cartera.me/2011/08/14/practical-corestorage</id>
+		<content type="html">&lt;p&gt;Mac OS X Lion introduced a new low-level system for managing relationships between physical disks and file systems. Currently, the primary use of CoreStorage is to enable FileVault 2, Lion&amp;#39;s full disk encryption system. CoreStorage includes low-level support for AES-XTS encryption, allowing a filesystem to be used on an encrypted volume without any modifications of the filesystem software. Therefor, any applications running on an encrypted volume don&amp;#39;t need to change any of their behaviors to support the new FileVault features.  &lt;/p&gt;
+
+&lt;p&gt;The FileVault 2 UI (found in the Security and Privacy pane in System Preferences) only allows the encryption of the computer&amp;#39;s startup disk. Though this may seem like a huge limitation, it is only in place at the UI level. There is absolutely nothing stopping you from using CoreStorage-based partitioning and encryption on external drives. This is proven by Apple&amp;#39;s option in Time Machine preferences to encrypt the backup volume. Enabling that will convert your backup volume to the CoreStorage format and proceed to encrypt the entire contents of the drive.  &lt;/p&gt;
+
+&lt;p&gt;CoreStorage is sparsely documented, and the Disk Utility utility included in Mac OS X has not been updated to allow full manipulation of volumes using the new format. However, Lion does include a new subcommand for the &lt;code&gt;diskutil&lt;/code&gt; command line utility called &lt;code&gt;coreStorage&lt;/code&gt; (which can be abbreviated as &lt;code&gt;cs&lt;/code&gt; to save time). The CoreStorage subcommand offers extensive new functionality, but only if you&amp;#39;re willing to explore it a bit yourself. Reading through the CoreStorage section of the &lt;code&gt;diskutil&lt;/code&gt; man page will help get you acquainted with the concepts, but playing with the various verbs is the easiest way to learn how everything works.  &lt;/p&gt;
+
+&lt;p class=&quot;divider&quot;&gt;~&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://georgews.com&quot;&gt;George&lt;/a&gt; and I recently decided to set up offsite backups for each of our computers, synced up on occasion via &lt;a href=&quot;http://en.wikipedia.org/wiki/Sneakernet&quot;&gt;Sneakernet&lt;/a&gt;. The device that is living at my house is a portable 500 GB FireWire hard drive. George&amp;#39;s backup weighs in at about 230 GB, and mine at about 220. Because I could fit a copy of both of our computers on the drive, I decided to partition it so that I could have yet another backup of my own computer. I had just been reading about CoreStorage, so I took this opportunity to learn how the commands worked.  &lt;/p&gt;
+
+&lt;p&gt;My final goal was to have the 500 GB drive be split up into two halves. Each partition would have its own separate password for encryption, and would be mountable independent of the other. I succeeded in creating this setup with CoreStorage commands, though it wasn&amp;#39;t always immediately obvious what to do.  &lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note: the steps described in this article will erase the contents of whatever physical volume you use. Continue at your own risk!&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;The biggest unit of CoreStorage objects is the Logical Volume Group (LVG). An LVG represents a group of one or more Physical Volumes (PVs), and a corresponding group of Logical Volume Families (LVFs) which store their data on the PVs. Each LVF can contain one or more Logical Volume (LV). Encryption occurs at the LVF level, meaning if you want multiple volumes with different passwords, you need to break the LVG into multiple LVFs (one per password).  &lt;/p&gt;
+
+&lt;p&gt;Read the last paragraph again to make sure you understand how everything is laid out, as its fairly different from traditional disk partitioning.  &lt;/p&gt;
+
+&lt;p&gt;We start out by creating an LVG (the largest unit). LVGs are created with the &lt;code&gt;diskutil cs create&lt;/code&gt; command. The command takes a name as the first parameter which will be used as the name for the LVG. This doesn&amp;#39;t really matter, but I would suggest you name it something similar to what you will be naming the different volumes. For instance, both of my volumes contain the word &amp;quot;Mirror&amp;quot;, so my LVG is called MirrorLVG.  &lt;/p&gt;
+
+&lt;p&gt;The next parameter for the command is an identifying piece of information for the Physical Volume you want to use to store the data of the LVG. You can provide more parameters afterwards, and each one will be treated as another PV to be added to the LVG. An identifying piece of information can be the current mount point of the drive (usually in &amp;#47;Volumes), the device identifier, or the BSD node name. Generally, the easiest one to use is the disk identifier. If you don&amp;#39;t know what the identifier is for your drive, run &lt;code&gt;diskutil list&lt;/code&gt; and find it in the far right column.  &lt;/p&gt;
+
+&lt;p&gt;The command I used to create my LVG for Mirror is as follows:  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;diskutil create MirrorLVG disk6
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This creates an LVG called MirrorLVG using disk6 (the identifier for my external hard drive) as a PV.  &lt;/p&gt;
+
+&lt;p&gt;Next up are the LVFs. CoreStorage will create LVFs automatically as you add LVs, so we can actually skip straight to adding the volumes themselves. The next command requires the UUID of the LVG we just created. You can find the UUID by running &lt;code&gt;diskutil cs list&lt;/code&gt; and looking for your LVG. Next to the words &amp;quot;Logical Volume Group&amp;quot; should be a long string of numbers and letters: that&amp;#39;s the UUID.  &lt;/p&gt;
+
+&lt;p&gt;My original goal was to create two partitions, which means two commands. Here&amp;#39;s the first one:  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;diskutil cs createVolume LVG-UUID jhfs+ &amp;quot;Mirror - Carter&amp;quot; 249G -passphrase
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;#39;s dissect the arguments here: the first is the UUID of the newly created LVG. The second parameter is the filesystem I want on the volume: jhfs+ represents a Journaled HFS+ filesystem. The &lt;code&gt;diskutil&lt;/code&gt; man page has a list of all the other choices. Next is a name for the new volume. Make sure to quote it if it contains special characters or spaces! After the name is the size of the volume. In this case I am specifying 249 GB. The &lt;code&gt;diskutil&lt;/code&gt; man page has more information about the size notation it uses. Finally, the &lt;code&gt;-passphrase&lt;/code&gt; flag is specified, which causes &lt;code&gt;diskutil&lt;/code&gt; to prompt for an encryption passphrase once it starts. Note that at this time there doesn&amp;#39;t seem to be a way to enable encryption after a volume has been created, so enable it here while you can.&lt;/p&gt;
+
+&lt;p&gt;The second command is exactly the same, save for a different volume name. You can check your work by running &lt;code&gt;diskutil cs list&lt;/code&gt; at any time.  &lt;/p&gt;
+
+&lt;p&gt;CoreStorage volumes can be resized on-the-fly using the &lt;code&gt;diskutil cs resizeVolume&lt;/code&gt; command. Note that this command, while seemingly functional, is not documented in the man page. It takes two parameters: the UUID of the volume to be resized, and the target size. I have resized my two volumes multiple times, and it seems to work perfectly.  &lt;/p&gt;
+
+&lt;p&gt;CoreStorage is an extremely promising technology, and has the potential to replace Apple&amp;#39;s RAID implementation and perhaps let them slowly break free from the dinosaur that is HFS. Hopefully Disk Utility will be updated in coming updates to OS X Lion to better take advantage of the features of CoreStorage. Until then, I hope you&amp;#39;re comfortable on the command line!&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Better Singletons in Objective-C</title>
+		<link href="http://cartera.me/2011/06/26/better-singletons"/>
+		<updated>2011-06-26T06:00:00-06:00</updated>
+		<id>http://cartera.me/2011/06/26/better-singletons</id>
+		<content type="html">&lt;p&gt;Singletons are special classes which have only one valid instance in an entire application or context. They are similar to global variables in that anything that tries to access them will always find itself sending messages to the same actual object as anything else. Singletons are very common in apps that utilize Objective-C. Apple&amp;#39;s often-used singletons include &lt;code&gt;NSFileManager&lt;/code&gt; and &lt;code&gt;NSUserDefaults&lt;/code&gt;.  &lt;/p&gt;
+
+&lt;p&gt;How to implement a singleton object in Objective-C yourself in the most correct way possible is a matter of quite a bit of contention, though it has recently settled down around one particular pattern:  the use of the &lt;code&gt;dispatch_once&lt;/code&gt; function to prevent an object from ever being initialized twice. However, there are a few nuances in how these new-age singletons should be implemented, and that&amp;#39;s why I&amp;#39;ve chosen to outline what, in my view, is the &amp;quot;correct&amp;quot; way to implement your own singleton.  &lt;/p&gt;
+
+&lt;p&gt;Without further ado, here is my basic implementation of a basic Objective-C singleton:&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/1257894.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;What you may immediately notice if you have ever seen older singleton implementations is that there is only one method here. Many singleton implementations override every possible memory management method (including &lt;code&gt;retain&lt;/code&gt;, &lt;code&gt;release&lt;/code&gt;, and even more obscure methods such as &lt;code&gt;allocWithZone:&lt;/code&gt;) to return the same single instance of the class. This is a Bad Thing™ for a few reasons. First, it&amp;#39;s largely unnecessary. Unless you are writing a framework that will be used by millions of apps, the only person who is going to be using your class is, well, you. Coding defensively is all well and good, but you can definitely go overboard, and overriding all of the memory management methods is decidedly beyond the point of necessity. Second, overriding those important methods of NSObject can lead to undefined behavior, and is an even bigger problem when using the newly-announced &lt;a href=&quot;http://clang.llvm.org/docs/AutomaticReferenceCounting.html&quot;&gt;Automatic Reference Counting&lt;/a&gt; system.  &lt;/p&gt;
+
+&lt;p&gt;This new pattern also has a fairly large benefit, which is that while the default behavior of the class is to only create a single instance of itself, it is still entirely possible for the class&amp;#39;s client to create separate instances of the class if the need arises. This is how many of Apple&amp;#39;s singleton classes work, a good example of which is &lt;code&gt;NSUserDefaults&lt;/code&gt;. Most of the time your app is using &lt;code&gt;NSUserDefaults&lt;/code&gt;, it is completely acceptable to simply use its shared instance, accessed via &lt;code&gt;[NSUserDefaults sharedUserDefaults]&lt;/code&gt;. However, some complex behaviors in your application may require customizing the domain of the entire user defaults object. If that situation arises, &lt;code&gt;NSUserDefaults&lt;/code&gt; has you covered with its other methods which initialize instances which are entirely separate from the singleton.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>SpamSieve and Mac OS X 10.6.5</title>
+		<link href="http://cartera.me/2010/11/10/spamsieve-1065"/>
+		<updated>2010-11-10T05:00:00-07:00</updated>
+		<id>http://cartera.me/2010/11/10/spamsieve-1065</id>
+		<content type="html">&lt;p&gt;Apple just released version 10.6.5 of OS X, and it updated Mail.app and the corresponding Message.framework. This means that if you are a user of the SpamSieve plugin for spam filtering in Mail.app, it will disable the bundle upon launch and tell you that it needs to be updated. Fortunately, the fix for this is simple:  &lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Find SpamSieve.mailbundle in your &lt;code&gt;~&amp;#47;Library&amp;#47;Mail&lt;/code&gt; folder. It will be in a &lt;code&gt;Bundles (Disabled)&lt;/code&gt; folder if you already launched Mail.app once, if not it will be in the &lt;code&gt;Bundles&lt;/code&gt; folder.&lt;/li&gt;
+&lt;li&gt;Inside the Contents folder of SpamSieve.mailbundle, open up the Info.plist file in Property List Editor*.&lt;/li&gt;
+&lt;li&gt;Add the following two keys to the &lt;code&gt;SupportedPluginCompatibilityUUIDs&lt;/code&gt; array:
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;857A142A-AB81-4D99-BECC-D1B55A86D94E&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;BDD81F4D-6881-4A8D-94A7-E67410089EEB&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Save the file, and if necessary, move the .mailbundle file out of the &lt;code&gt;Bundles (Disabled)&lt;/code&gt; folder and into the &amp;quot;Bundles&amp;quot; folder.&lt;/li&gt;
+&lt;li&gt;Relaunch Mail.app.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;* If you don&amp;#39;t have Property List Editor and would rather not download the whole Developer Tools package to get it (I don&amp;#39;t blame you!), then feel free to &lt;a href=&quot;http://zcr.me/f/SpamSieve/Info.plist&quot;&gt;download&lt;/a&gt; my edited copy of the Info.plist file. Simply replace the Info.plist file in your SpamSieve.mailbundle with the one I just linked to.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Ridiculous Optimization</title>
+		<link href="http://cartera.me/2010/09/03/ridiculous-optimization"/>
+		<updated>2010-09-03T06:00:00-06:00</updated>
+		<id>http://cartera.me/2010/09/03/ridiculous-optimization</id>
+		<content type="html">&lt;p&gt;The latest project I&amp;#39;ve been working on with regards to this website is optimizing its load time. At first it was simple, obvious things: enable GZip compression on the server, minify CSS and JS, you know:  standard optimization. After that was done, the index page of my site weighed in at about &lt;strong&gt;21.7kb&lt;/strong&gt;. Quite lightweight, but that wasn&amp;#39;t good enough. So I started on the next step:  ridiculous optimization.  &lt;/p&gt;
+
+&lt;p&gt;The first bit of ridiculous optimization is extremely heavy caching of all static files. That may not seem ridiculous, but when the files we&amp;#39;re talking about are around a kilobyte or less each, it&amp;#39;s quite a bit of trouble for such a minute gain. The issue with caching is, of course, that you need to have some way of invalidating the cached copies if you change something, otherwise they&amp;#39;ll never get updated on user&amp;#39;s machines. The fix I&amp;#39;m using for this problem is query parameters (like &amp;quot;?revision=whatever&amp;quot; on the end of the URL). When the links are generated for my static files, it appends &amp;quot;?revision=&amp;quot; and the most recent commit hash &lt;em&gt;that affects the file&lt;/em&gt;. That last bit there is important:  it means that even when I change something else on my site and move to a newer commit hash, the files that are still unchanged remain cached. I accomplish this bit of magic with a Jekyll plugin (place in a .rb file in a _plugins directory in your site folder):  &lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://github.com/CarterA/cartera.me/blob/master/_plugins/VersionControlledFiles.rb&quot;&gt;View VersionControlledFiles.rb on GitHub.&lt;/a&gt;  &lt;/p&gt;
+
+&lt;p&gt;The second bit of optimization was to get rid of &lt;a href=&quot;http://modernizr.com/&quot;&gt;Modernizr&lt;/a&gt;. I know what you&amp;#39;re thinking:  &lt;em&gt;but Carter, your site uses HTML5 and you need Modernizr to enable HTML5 for older browsers, right?&lt;/em&gt;. Wrong. I don&amp;#39;t deny that it is an excellent and useful library, but what makes it so big is that it doesn&amp;#39;t just enable all sorts of features, it also lets you know which ones are supported. It&amp;#39;s the second part that takes a ton of code. I am now using a tiny script that I&amp;#39;ve had saved in my snippets for a long time (I didn&amp;#39;t write it, so if you recognize the source, let me know!):  &lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/1257903.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;This simply adds each of the new HTML5 elements to the DOM so that IE and older versions of Firefox can style those elements correctly. Best part is, &lt;em&gt;it&amp;#39;s tiny&lt;/em&gt;!  &lt;/p&gt;
+
+&lt;p&gt;One more thing:  I mentioned early on that I minified CSS. Now, working with minified CSS is a gigantic pain in the ass, so I wrote another Jekyll plugin to do that:  &lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://github.com/CarterA/cartera.me/blob/master/_plugins/Minifier.rb&quot;&gt;View Minifier.rb on GitHub.&lt;/a&gt;  &lt;/p&gt;
+
+&lt;p&gt;After all of this, my site now weighs in at about &lt;strong&gt;12.2kb&lt;/strong&gt;, and around &lt;strong&gt;6kb&lt;/strong&gt; once it has everything cached. Happy optimizing!&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Streamlined Yard Work</title>
+		<link href="http://cartera.me/2010/08/22/streamlined-yard-work"/>
+		<updated>2010-08-22T06:00:00-06:00</updated>
+		<id>http://cartera.me/2010/08/22/streamlined-yard-work</id>
+		<content type="html">&lt;p&gt;In my &lt;a href=&quot;/2010/08/12/about-this-website/&quot;&gt;recent article&lt;/a&gt; describing the system that powers this website, I discussed some &amp;quot;yard work&amp;quot;. I use this term to refer to tasks that I accomplish using Ruby&amp;#39;s &lt;a href=&quot;http://rake.rubyforge.org/&quot;&gt;Rake&lt;/a&gt;. Since I published that article, I&amp;#39;ve made several improvements to the Rakefile that powers most of my website&amp;#39;s common operations. As such, I figured that I&amp;#39;d post a more in-depth description of the lovely scripting solution that I&amp;#39;ve come up with.  &lt;/p&gt;
+
+&lt;p&gt;To begin, I wanted to make the output from the Rake tasks more stylish and readable. I took inspiration from &lt;a href=&quot;http://mxcl.github.com/homebrew/&quot;&gt;Homebrew&lt;/a&gt;, and wrote this function:&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/1257914.js?file=printHeader.rb&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;This depends on the excellent &lt;code&gt;term-ansicolor&lt;/code&gt; gem, and produces command-line output that looks something like this: &lt;img src=&quot;/images/posts/2010-08-22-streamlined-yard-work/sampleHeader.png&quot; alt=&quot;Compiling website...&quot;&gt;. It distinguishes itself from the other command line output, so that you&amp;#39;re instantly drawn to the more important text (the headers). Of course, this would mean nothing if I didn&amp;#39;t use it.  &lt;/p&gt;
+
+&lt;p&gt;The default rake task is set to &lt;code&gt;develop&lt;/code&gt;. This is the task I run whenever I&amp;#39;d like to work on the site locally, preview an article as I write it, or test any new features without deploying them to the server. Here, take a look:&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/1257914.js?file=rakeTasks.rb&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Don&amp;#39;t worry:  I can hear you yelling and screaming. You thought this was going to be simple. Ha! The develop task basically re-implements a lot of the things that the &lt;code&gt;jekyll&lt;/code&gt; command line utility usually does. I did that so that I could control the output and the order in which code was executed. First off, the &lt;code&gt;develop&lt;/code&gt; task runs the &lt;code&gt;build&lt;/code&gt; task. The build task simply creates a generic Jekyll site object and processes it, forcing it to use the &lt;code&gt;_config.yml&lt;/code&gt; that resides in my site&amp;#39;s directory. The &lt;code&gt;site&lt;/code&gt; object is kept around so that I can re-use it each time a file gets changed.  &lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;develop&lt;/code&gt; task then starts up a directory watcher, which monitors the source directory for any changes. Whenever a file is changed, the site is re-processed so that the files in the &lt;code&gt;_site&lt;/code&gt; directory are always current. Currently, it processes the entire site again whenever a file is changed, which I&amp;#39;m sure is extraordinarily inefficient. If you have any idea how to make Jekyll only re-process the changed files, I&amp;#39;d love to know.  &lt;/p&gt;
+
+&lt;p&gt;After the site is built and the watcher is running smoothly, a web server is started. I&amp;#39;m using the &lt;code&gt;WEBrick&lt;/code&gt; web server (comes with Ruby), mostly because of how easy it is to configure. I considered using &lt;a href=&quot;http://code.macournoyer.com/thin/&quot;&gt;Thin&lt;/a&gt;, but it requires I use an adapter like Rack, which seemed unnecessary when I was simply serving static files. I have the server configured to only log errors to the console, which is important:  it keeps my command line clean, unless there is an actual issue. This is easy to modify if you want to actually see your access log, but I don&amp;#39;t. The server spins up, the website opens in the default browser, and yet another header is printed.  &lt;/p&gt;
+
+&lt;p&gt;See? That wasn&amp;#39;t so complicated after all!  &lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;deploy&lt;/code&gt; has actually stayed pretty much the same (with the exception of headers) since the first post about it, so I won&amp;#39;t go into it here. If you&amp;#39;re interested in using this Rakefile in your own project, feel free to &lt;a href=&quot;http://github.com/CarterA/cartera.me/blob/master/Rakefile.rb&quot;&gt;check it out on GitHub&lt;/a&gt;.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Introducing CZKit</title>
+		<link href="http://cartera.me/2010/08/18/introducing-czkit"/>
+		<updated>2010-08-18T06:00:00-06:00</updated>
+		<id>http://cartera.me/2010/08/18/introducing-czkit</id>
+		<content type="html">&lt;p&gt;Though it has been publicly available for many months now, I&amp;#39;d like to take a moment and formally introduce my personal collection of open-source libraries of Objective-C&amp;#47;C code, CZKit. Although still fairly small, CZKit has an organized and distributed configuration that will let it grow quite nicely in the future. I use the name CZKit as an umbrella term to identify four different libraries of code (though that number is subject to change). The easiest way to describe the whole kit is to go through each component library individually.&lt;/p&gt;
+
+&lt;h2&gt;CZCore&lt;/h2&gt;
+
+&lt;p&gt;This is actually the newest of the libraries, despite what the name might indicate. Originally the plan was to have each library completely independent of the other, so that a developer wouldn&amp;#39;t have to include a lot of unnecessary code in their application if they didn&amp;#39;t want to. This is true to an extent, but I decided that I wanted to have one library where I could put universal code. This library works on Mac OS X and iOS, and currently only contains some debugging functions. Eventually I might add more low-level functionality to it, so expect its list of functions to grow. Located in the scenic &lt;code&gt;CZDebugger.h&lt;/code&gt;, you&amp;#39;ll find the following useful functions:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;CZLog(arguments, ...);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It&amp;#39;s kind of NSLog. In fact, it&amp;#39;s just a &lt;code&gt;#define&lt;/code&gt;&amp;#39;d alias for NSLog, with a few extra arguments. It logs the function (or method) name that it is called from, and the line number. Simple, yet helpful.  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;CZLogMethodName();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This one is a prime example of how verbose and easy to understand my function names are.  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;CZAssert(statement);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This type of function is generally pretty common in unit testing libraries, though I find myself using similar systems while debugging as well. If the passed statement is true, nothing happens. If it is false, it logs the failure.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;+ (BOOL)debuggerIsAttached;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is the only actual method in the CZDebugger class file, and it simply tells you whether your program is currently being debugged. It currently doesn&amp;#39;t work in iOS, so it&amp;#39;s &lt;code&gt;#ifdef&lt;/code&gt;&amp;#39;d out for now.&lt;/p&gt;
+
+&lt;h2&gt;CZCategories&lt;/h2&gt;
+
+&lt;p&gt;The name pretty much speaks for itself here:  CZCategories is a library of categories for many of Apple&amp;#39;s classes. To those of you who don&amp;#39;t know, Objective-C categories can be used to add methods to existing classes without actually subclassing them. I won&amp;#39;t list all of the different methods (most of them are documented inline using Doxygen-style comments), but there is one particular feature that is worthy of note. The general concern with categories is that there is a possibility of conflicting method implementations if two different third-party categories are loaded and they used the same method names. One of the ways that developers have avoided this is to use prefixes, just like with classes. I have done this with my categories. Here&amp;#39;s an example of one of the method signatures:  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;- (BOOL)cz_containsOnlyStrings;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It gets the job done, but I like my code to be pretty, and that sure isn&amp;#39;t. So I added a preprocessor macro, &lt;code&gt;CZ_NAMESPACE_PARANOIA&lt;/code&gt;. If it is defined (which it is by default), then all category methods will be prefixed with &lt;code&gt;cz&lt;/code&gt;. If you include the libraries and &lt;code&gt;#undef&lt;/code&gt; the macro, then you can use the methods without the prefix. It&amp;#39;s as simple as that.  &lt;/p&gt;
+
+&lt;h2&gt;CZUtilities&lt;/h2&gt;
+
+&lt;p&gt;The definition of this one is pretty vague, really. It basically encompasses all independent classes that are standalone but are not a UI element. It includes &lt;code&gt;CZAppPrefs&lt;/code&gt; which is an Objective-C interface built on top of the CoreFoundation preferences suite. It allows you to quickly modify the preferences of any application on the system. CZUtilities also contains &lt;code&gt;CZColors.h&lt;/code&gt;, which isn&amp;#39;t an actual class but simple a set of functions and data structures for working with simple color values in either the HSB or RGB system. It has functions for converting between the two color spaces, which I find &lt;em&gt;extremely&lt;/em&gt; useful, though most people don&amp;#39;t need that at all. The last utility file in there (for now) is &lt;code&gt;CZGraphics.h&lt;/code&gt;, which also isn&amp;#39;t an actual class. It currently contains some functions that can be very helpful if you&amp;#39;re using CoreGraphics to draw UI elements; they specifically help with the creation of rounded rectangles. In addition to rounded rectangles, there are a couple functions that can convert &lt;code&gt;CGRect&lt;/code&gt;&amp;#39;s to strings and log them, which can be a pain to do manually.&lt;/p&gt;
+
+&lt;h2&gt;CZUI&lt;/h2&gt;
+
+&lt;p&gt;This one doesn&amp;#39;t contain much yet, but it has the potential to be very helpful. As you may have guessed, this library contains custom user interface elements. The only two member classes that are complete are &lt;code&gt;CZIconImageView&lt;/code&gt; and &lt;code&gt;CZInsetTextField&lt;/code&gt;. The inset text field is the simpler of the two:  it is a simple subclass of &lt;code&gt;NSTextField&lt;/code&gt; that draws a subtle inset under the text inside the view. It&amp;#39;s helpful if you have a UI that includes a bottom bar and you would like to place text on it, as the inset helps make the text really really pop. &lt;code&gt;CZIconImageView&lt;/code&gt; is quite a bit more complex, but I think it can be very helpful to developers of Mac applications that deal with files.  &lt;/p&gt;
+
+&lt;p&gt;The icon image view is a direct subclass of &lt;code&gt;NSImageView&lt;/code&gt;, and as such, it displays an image inside a customizable container. &lt;code&gt;CZIconImageView&lt;/code&gt; differs by letting you set the &lt;code&gt;representedFile&lt;/code&gt; of the view, which will cause it to display the icon of the file. Apart from allowing you to customize the size in pixels of the icon, it also comes with out-of-the-box for drag-and-drop. If editing is enabled in the view, dropping a file on it will set the &lt;code&gt;representedFile&lt;/code&gt; to a URL pointing to the dropped file. Even if editing is not enabled, the user will be able to drag the icon out of the image view and drop it anywhere, and the file will be sent to the dropped location. I originally developed this class for the now-defunct video converter, &lt;a href=&quot;http://github.com/CarterA/The-Magic-Thing&quot;&gt;The Magic Thing&lt;/a&gt;.  &lt;/p&gt;
+
+&lt;h2&gt;Technical Details&lt;/h2&gt;
+
+&lt;p&gt;I&amp;#39;ve been told that CZKit is an excellent example of a well-organized and well-thought-out project, and I&amp;#39;d like to think that&amp;#39;s true. It may seem a bit overwhelming at first (there are a total of 11 different targets), but once you get to know my organizational systems and habits, the project will become fairly understandable.  &lt;/p&gt;
+
+&lt;p&gt;The CZKit project is managed by Xcode, and most of my work on it is done through Xcode as well (though I do use TextMate on occasion). The most recent version of the source code can be found &lt;a href=&quot;http://github.com/CarterA/CZKit&quot;&gt;on GitHub&lt;/a&gt;. All of the libraries can be compiled error-free for both Mac OS X and iOS, though when compiling for iOS, CZUI will contain no actual code and CZUtilities has fewer useful classes. I am working to port most of the classes and features from Mac to iOS, though the UI elements will probably never be ported (the UI needs on iOS are completely different).  &lt;/p&gt;
+
+&lt;p&gt;If you want to use CZKit in your own project, feel free to do so. It is released under the MIT license, which means you can use it for pretty much anything you&amp;#39;d like (including commercial projects). You absolutely don&amp;#39;t have to credit me if you don&amp;#39;t want to, though I&amp;#39;d love to hear from you if you need help with using it or just found a creative purpose for some of my code.  &lt;/p&gt;
+
+&lt;p&gt;The libraries are designed to be fairly independent, as I said before, so if you only want to use the categories or utilities, that&amp;#39;s quite supported. Just remember to link to your desired library in addition to CZCore. The CZKit framework (for Mac only) is set up to include all of the libraries, though it is trivial to remove some unnecessary libraries from Xcode before you build it.  &lt;/p&gt;
+
+&lt;p&gt;I am currently not providing binary releases of CZKit or any of its libraries because it hasn&amp;#39;t reached a stage where I want to commit to keeping APIs stable. Once it has reached a truly stable point in its development, I will make binaries available of each library in the Downloads section of the GitHub repository.  &lt;/p&gt;
+
+&lt;p&gt;If you have any questions about CZKit, feel free to ask in the comments!&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>About This Website</title>
+		<link href="http://cartera.me/2010/08/12/about-this-website"/>
+		<updated>2010-08-12T06:00:00-06:00</updated>
+		<id>http://cartera.me/2010/08/12/about-this-website</id>
+		<content type="html">&lt;p&gt;In December of 2008, the first iteration of this website went online for the world to see. Available at the slightly-cheesy domain name &amp;quot;lifeofcarter.com&amp;quot; (courtesy of my friend &lt;a href=&quot;http://wilnichols.com/&quot;&gt;Wil Nichols&lt;/a&gt;), it boasted a shiny theme on top of a brand-new installation of WordPress. My first post (still available in the archives of this site) was a short and emotional rant about the current state of my life. Since then I&amp;#39;ve moved domain names, and the theme of my site has changed many times. The articles that have been written since then range from &lt;a href=&quot;/2009/02/25/safari-4/&quot;&gt;geeky&lt;/a&gt; and &lt;a href=&quot;/2009/04/15/understanding-object-oriented-programming-and-the-mvc-system/&quot;&gt;intelligent&lt;/a&gt; to &lt;a href=&quot;/2009/03/05/transcription/&quot;&gt;disturbing&lt;/a&gt; and &lt;a href=&quot;/2009/01/09/clogged-senses/&quot;&gt;thought-provoking&lt;/a&gt;, and finally to &lt;a href=&quot;/2009/06/13/seven-ways-to-tell-if-your-band-is-too-old/&quot;&gt;random&lt;/a&gt; and &lt;a href=&quot;2009/02/20/holidays/&quot;&gt;hilarious&lt;/a&gt;.  &lt;/p&gt;
+
+&lt;p&gt;A few months ago I made the decision to switch to a different blogging engine for my site. WordPress had served me well, but it simply doesn&amp;#39;t suit me well enough. I like lots of control, and I don&amp;#39;t need many features. WordPress has too many features that I don&amp;#39;t need, and more than that, I don&amp;#39;t fully understand how it works. I also came to the realization that using a PHP system for something that gets updated &lt;em&gt;at most&lt;/em&gt; once a day was a foolish use of server power:  serving static files would be much more efficient. So I set out on a search for the perfect blogging engine.  &lt;/p&gt;
+
+&lt;h2&gt;Scouring the Systems&lt;/h2&gt;
+
+&lt;p&gt;The first option that I encountered was &lt;a href=&quot;http://github.com/creationix/wheat&quot;&gt;Wheat&lt;/a&gt;. The reason for not choosing this one was simple: my current shared hosting provider doesn&amp;#39;t allow Node.JS, and I wasn&amp;#39;t willing to upgrade to a VPS just for a blog. I kept in mind all of the features that Wheat offered, and continued my search.  &lt;/p&gt;
+
+&lt;p&gt;The next option I found seemed pretty damn perfect, and was almost my chosen engine. &lt;a href=&quot;http://cloudhead.io/toto&quot;&gt;toto&lt;/a&gt; gave me several of the features of Wheat that I loved so much:  tight integration with &lt;a href=&quot;http://git-scm.org/&quot;&gt;git&lt;/a&gt;, an emphasis on static files, and support for my favorite markup language, &lt;a href=&quot;http://daringfireball.net/projects/markdown/&quot;&gt;Markdown&lt;/a&gt;. I imported all of my posts from WordPress, went through each of them and reformatted them in Markdown, and configured Toto to my liking. Of course, this was all before I realized that my &lt;em&gt;lovely&lt;/em&gt; shared hosting provider also doesn&amp;#39;t &lt;em&gt;really&lt;/em&gt; support Rack apps. At this point, I had two choices:  I could stick with Toto and find a different host, or I could just keep on lookin&amp;#39;. Needless to say, I didn&amp;#39;t switch hosts.  &lt;/p&gt;
+
+&lt;p&gt;Enter &lt;a href=&quot;http://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt;. Jekyll is everything that I ever wanted in a blogging engine. Really. It isn&amp;#39;t perfect, but what&amp;#39;s excellent about it is that if there&amp;#39;s something wrong, I know exactly how it works and how to fix it. Jekyll is written in Ruby, just like toto, except Jekyll doesn&amp;#39;t rely on Rack or Rails. It runs on the your machine only, and is essentially an added &amp;quot;build&amp;quot; step between you and the browser. I coded this entire site in TextMate using standard HTML5 and CSS3, and then at the end I added just a few little variables to the markup. Presto-chango, my site is built and I am at peace with the world.  &lt;/p&gt;
+
+&lt;p&gt;You didn&amp;#39;t think I would leave it at that though, did you? Of course not! I haven&amp;#39;t even &lt;em&gt;begun&lt;/em&gt; to brag about all the great ways that my site works.  &lt;/p&gt;
+
+&lt;h2&gt;Yard Work&lt;/h2&gt;
+
+&lt;p&gt;Before I began this project, I had absolutely no knowledge of the lovely language that is &lt;a href=&quot;http://www.ruby-lang.org/&quot;&gt;Ruby&lt;/a&gt;. Although I am still no professional, I have developed a fairly strong understanding of the language. One of my favorite Ruby tools is &lt;a href=&quot;http://rake.rubyforge.org/&quot;&gt;Rake&lt;/a&gt; (it&amp;#39;s like Make, but written in Ruby...get it?). All of the major stages of work on my website are  automated via Rake:  development, testing, and deployment. I can begin developing by simply running &lt;code&gt;cd $blog; rake&lt;/code&gt; from Terminal. That will spin up a testing server at &lt;a href=&quot;localhost:4000&quot;&gt;localhost:4000&lt;/a&gt; and will automatically regenerate files whenever I save them. All of this is accomplished with this fragment of my Rakefile:  &lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/1257930.js?file=compiling.rb&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;I used this setup to comfortably code most of my website. There comes a point, of course, where you need to deploy your beautiful website to a public-facing server. For that, I have another task: &lt;code&gt;rake deploy&lt;/code&gt;  &lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/1257930.js?file=deploying.rb&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;This task is pretty simple:  it wraps a rather complicated &lt;code&gt;rsync&lt;/code&gt; command into a nice-and-simple Rake task. It connects to my server via SSH using public&amp;#47;private key pairs so that I don&amp;#39;t have to enter a password (the Mac OS X keychain remembers the passphrase for my private key). If you have a host that lets you install gems, you can also set it up so that your server is a git remote and builds the jekyll site whenever you push to it. My host doesn&amp;#39;t let me do this though, so I wasn&amp;#39;t able to use that option.  &lt;/p&gt;
+
+&lt;p&gt;The final bit of yard work in my Rakefile is a task which creates a new post:  &lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/1257930.js?file=newPost.rb&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Though it&amp;#39;s a bit more complicated than the last few tasks, it&amp;#39;s still fairly straightforward. It starts by prompting for a title and a file name. It uses those to generate the metadata of the file, and then creates the post file based on the current date. Finally, it sends the path to &lt;code&gt;mate&lt;/code&gt; (which opens the file in TextMate) so that I can start writing the post body.  &lt;/p&gt;
+
+&lt;p&gt;If you&amp;#39;d like to see the actual Rakefile, you can checkout the latest copy of it &lt;a href=&quot;http://github.com/CarterA/cartera.me/blob/master/Rakefile.rb&quot;&gt;on GitHub&lt;/a&gt;.  &lt;/p&gt;
+
+&lt;p&gt;Update 8&amp;#47;22&amp;#47;10:  I&amp;#39;ve improved the Rake tasks that I use, and written about them in more depth &lt;a href=&quot;/2010/08/22/streamlined-yard-work/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;A Cavalcade of Cascading Styles&lt;/h2&gt;
+
+&lt;p&gt;My website uses &lt;a href=&quot;http://validator.w3.org/check?uri=http%3A%2F%2Fcartera.me%2F&quot;&gt;valid HTML5&lt;/a&gt;, though a vigilant (or neurotic) reader may note that the CSS used is absolutely full of invalid properties. The reason for this is fairly simple:  &lt;a href=&quot;http://jigsaw.w3.org/css-validator/&quot;&gt;the CSS3 validator&lt;/a&gt; doesn&amp;#39;t allow vendor-prefixed CSS attributes (like -webkit-border-radius, or -moz-box-shadow). I get that rule, I really do. Unfortunately, that means that it is impossible to create a website that actually looks good in most browsers and keep your CSS valid at the same time. I decided to go the &amp;quot;works &lt;em&gt;and&lt;/em&gt; looks good&amp;quot; route, instead of taking the &amp;quot;looks good to the validator but renders poorly and doesn&amp;#39;t really work&amp;quot; approach. Here&amp;#39;s an example of how I managed to get the inset shadow of the main content area from only CSS:  &lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/1257930.js?file=boxShadow.css&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Fun, right? It sure isn&amp;#39;t pretty, but it gets the job done. Granted, the shadow doesn&amp;#39;t appear in IE7 or earlier, but quite frankly, I&amp;#39;m okay with that. Now, what &lt;em&gt;does&lt;/em&gt; work in IE7 and earlier is my rounded corners:  &lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/1257930.js?file=borderRadius.css&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;The first three lines cover most browsers that visit my site, but the last line is the most impressive. The &lt;code&gt;behavior&lt;/code&gt; rule is only used by IE, and it links to a local version of &lt;a href=&quot;http://css3pie.com/&quot;&gt;PIE&lt;/a&gt;. PIE is a JS program that uses IE-specific &amp;quot;filters&amp;quot; (a rendering system only ever used by IE) to implement many of the new CSS3 features that are currently unsupported by the Microsoft browser. Let me just say that it is absolutely amazing, though my one request would be support for inset box shadows (currently being tracked in this &lt;a href=&quot;http://github.com/lojjic/PIE/issues#issue/3&quot;&gt;issue thread&lt;/a&gt; on GitHub).  &lt;/p&gt;
+
+&lt;h2&gt;Syntactical and Semantical Perfection&lt;/h2&gt;
+
+&lt;p&gt;It doesn&amp;#39;t take much work to get an XHTML page to validate as HTML5. In fact, it takes nothing more than a switched DOCTYPE. But when I set out to remake this site, I wanted more than just validation:  I wanted the site to actually &lt;em&gt;use&lt;/em&gt; many of the new semantic elements available in the HTML5 spec. Thus, all of the articles are wrapped in &lt;code&gt;&amp;lt;article&amp;gt;&lt;/code&gt; tags, and all of the different pages are organized using &lt;code&gt;&amp;lt;section&amp;gt;&lt;/code&gt;&amp;#39;s. The navigation is wrapped in a &lt;code&gt;&amp;lt;nav&amp;gt;&lt;/code&gt; tag, and the site uses both &lt;code&gt;&amp;lt;header&amp;gt;&lt;/code&gt; and &lt;code&gt;&amp;lt;footer&amp;gt;&lt;/code&gt; tags (though the footer is quite empty at the moment...I should fix that.) All of these elements can even be styled just like traditional HTML elements:  but there&amp;#39;s a catch. Some older browsers (I&amp;#39;m looking at one in particular here, and it rhymes with blinternet blexplorer) completely screw up when they hit unknown elements. Luckily, all of this is solved by this simple line of code in my &lt;code&gt;head&lt;/code&gt; tag:&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/1257930.js?file=simpleLine.html&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Thank goodness for &lt;a href=&quot;http://paulirish.com/&quot;&gt;Paul Irish&lt;/a&gt; and his &lt;a href=&quot;http://www.modernizr.com/&quot;&gt;Modernizr&lt;/a&gt; library.  &lt;/p&gt;
+
+&lt;h2&gt;Et cetera...&lt;/h2&gt;
+
+&lt;p&gt;I could go on for hours about this website, if only I could come up with more catchy names for sections. This post has barely touched on the great parts of this site, and way more can be found by poking around the &lt;a href=&quot;http://github.com/CarterA/cartera.me&quot;&gt;GitHub repository&lt;/a&gt;. I hope I&amp;#39;ve inspired you to create some great websites, or at least to admire this one!&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Installing iOS Beta Firmwares</title>
+		<link href="http://cartera.me/2010/04/09/installing-iphone-os-redacted-beta-firmware"/>
+		<updated>2010-04-09T06:00:00-06:00</updated>
+		<id>http://cartera.me/2010/04/09/installing-iphone-os-redacted-beta-firmware</id>
+		<content type="html">&lt;p&gt;So you want to install the beta? Well, I have. Here are my suggestions (read them all the way through before starting):~  &lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Update to iTunes 9.1 first.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Download and install the beta version of the Developer Tools package.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Restart your computer. The installer won&amp;#39;t tell you to do this, but trust me, it may very well save you a lot of time and trouble.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Start up, go into iTunes, and backup your device. Unless you&amp;#39;re okay with a clean slate (no old data), in which case don&amp;#39;t even open iTunes. Once complete, close iTunes completely.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Open the new (beta) version of Xcode.app. Go into the Organizer, and then select your device (plug it in if you haven&amp;#39;t already). Select &amp;quot;Other Version&amp;quot; from the software version pulldown menu, and then hit Restore.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;You&amp;#39;re done!&lt;br&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:  Not all of these steps are absolutely necessary, with a little luck. But by doing them straight away, you avoid a lot of possible issues.&lt;/strong&gt;&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Shapps</title>
+		<link href="http://cartera.me/2010/04/07/shapps"/>
+		<updated>2010-04-07T06:00:00-06:00</updated>
+		<id>http://cartera.me/2010/04/07/shapps</id>
+		<content type="html">&lt;blockquote&gt;
+&lt;p&gt;shapp |sh app|&lt;br&gt;
+noun&lt;br&gt;
+A colloquial conjugation of the words &lt;em&gt;&amp;quot;shit&amp;quot;&lt;/em&gt; and &lt;em&gt;&amp;quot;app&amp;quot;&lt;/em&gt;, which refers to an application, most likely distributed via Apple Inc.&amp;#39;s App Store, that is poorly designed, implemented, or both. &lt;em&gt;The man was quite frustrated due to the large number of shapps in the App Store.&lt;/em&gt;  &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&amp;lt;shamelessplug&amp;gt;  &lt;/p&gt;
+
+&lt;p&gt;My company now has two apps available on the App Store, both of which are &lt;em&gt;certainly&lt;/em&gt; not &amp;quot;shapps&amp;quot;. I&amp;#39;m honestly not sure why one of them hasn&amp;#39;t been mentioned here before, considering it has been available for quite a while. I suppose that is due to its price tag and the lack of need for promotion (it&amp;#39;s fairly self-driven). The second of the two is one that I&amp;#39;ve mentioned here briefly, but has been a common topic on my &lt;a href=&quot;http://twitter.com/CarterA&quot;&gt;Twitter feed&lt;/a&gt;.  &lt;/p&gt;
+
+&lt;p class=&quot;centerImage&quot;&gt;&lt;img src=&quot;/images/posts/2010-04-07-shapps/mticon.png&quot; width=59 height=59&gt;&lt;/p&gt;  
+&gt; [MathTasks](http://itunes.apple.com/us/app/mathtasks/id324981381) (link opens iTunes) is a utility application designed to simplify the solving of common math problems. It has a database of equations/formulae that are presented to you in both LaTeX rendered images, and basic variable input forms. It can then take the variables you input and solve each equation. MathTasks is free.
+  
+&lt;p class=&quot;centerImage&quot;&gt;&lt;img src=&quot;/images/posts/2010-04-07-shapps/fsicon.png&quot; width=59 height=59&gt;&lt;/p&gt;
+&gt; [Five Square](http://itunes.apple.com/us/app/five-square/id345017981) (link opens iTunes) is a solitaire-type card game, unique to the iPhone/iPad. It takes traditional solitaire games and almost completely removes the element of luck:  winning any given Five Square layout requires planning, strategy, and knowledge of the game. Five Square comes in both regular and [HD Versions](http://itunes.apple.com/us/app/five-square-hd/id364907139) (link opens iTunes) for the iPhone and iPad, respectively.  
+
+Full disclosure:  I *not* the lead developer on either of these applications. The MathTasks team is headed up by [Preston M.](http://twitter.com/mathcolo), and [George Woodliff-Stanley](http://twitter.com/gmws82) is the lead on Five Square. Both apps, however, are distributed by my company, Opt-6 Products, LLC. I&apos;m not going to link to the corporate site right now, because it&apos;s a mess.  
+
+&amp;lt;/shamelessplug&amp;gt;  
+
+Okay! Now that we have that out of the way, let&apos;s get to the meat of this article:  my rant. I develop for the Mac primarily, but recently I&apos;ve been working more with George on iPhoneOS[^1] development. I&apos;ve got to say, this stuff takes *a lot* of work. The devices vary greatly in performance, and the APIs are much more limited than those found on the Mac. I don&apos;t deny that it is a great platform that Apple has created:  it definitely is, but I will say that I found the transition from Mac to iPhone development difficult.  
+
+Don&apos;t worry, I&apos;m getting to the point soon.  
+
+Because of how much work George and I have put into Five Square, I am getting increasingly frustrated with the quality of the apps available on the App Store. I believe that showing my application next to thousands of other *shapps* is perfectly fine:  it accents my app&apos;s quality. But the issue is that there is no way for me to point the light on my app without it getting blocked out by the cluster of shapps surrounding it. I can already hear some of you shouting *&quot;But Carter! That&apos;s what advertising is for!&quot;* And to that I will tell you that I have marketed the *hell* out of Five Square. Or at least I&apos;ve tried. Multiple ads on major networks, attempts at independent reviews, hiring a dedicated PR person:  the whole nine yards. Nothing has worked, and I sincerely believe that it is because people just can&apos;t find it. I don&apos;t have a big name behind me, or millions of dollars to spend on ad revenue, and thus I simply can&apos;t drive people to my application. It isn&apos;t locatable through browsing (at least not without a *ton* of browsing), and a search has to be thoughtfully formatted for the person to find Five Square.  
+
+Enough about me! Let&apos;s talk about the different types of shapps.  
+
+## You&apos;re a Giant Corporation! Hire a Designer! ##
+
+EA is the obvious target. I&apos;m not big on the design for any of their apps, and yet they top the charts constantly due to the big name behind them. There are plenty of apps in the same categories/genres that beat the crap out of the EA apps in both design and usability, and yet they don&apos;t become popular due to the lack of a big name.  
+
+Case in point:  [EA&apos;s Battleship](http://www.eamobile.com/iphone-games/battleship)  
+&lt;p class=&quot;centerImage&quot;&gt;&lt;img alt=&quot;Battleship Screenshot 1&quot; src=&quot;/images/posts/2010-04-07-shapps/battleship1.jpg&quot; width=320 height=480 style=&quot;margin-right: 20px;&quot;&gt;&lt;img alt=&quot;Battleship Screenshot 2&quot; src=&quot;/images/posts/2010-04-07-shapps/battleship2.jpg&quot; width=320 height=480&gt;&lt;/p&gt;  
+
+&lt;p&gt;Need I say more? Okay, fine, I will. The gradients are harsh and unnecessary, the images are quite aliased, the buttons look like they&amp;#39;ve had every possible effect (along with a small pile of shit) applied to them, and the tap areas are too small. To get a bit more detailed, the glyphs in the buttons should be thicker (they&amp;#39;re difficult to see right now), and the water background looks more like they took a solid blue image and applied a watercolor filter to it.  &lt;/p&gt;
+
+&lt;p&gt;And then remember when I said that there were other apps that could beat out the most popular ones? Here is an example:  &lt;a href=&quot;http://www.warshipsthegame.com/&quot;&gt;Warships, by Edovia&lt;/a&gt;&lt;br&gt;
+&lt;p class=&quot;centerImage&quot;&gt;&lt;img alt=&quot;Warships Screenshot&quot; src=&quot;/images/posts/2010-04-07-shapps/warships.jpg&quot; width=480 height=320&gt;&lt;/p&gt;  &lt;/p&gt;
+
+&lt;p&gt;This is just a tiny peek at the app, but I can assure you that its design is &lt;em&gt;far&lt;/em&gt; better than EA&amp;#39;s original version. It addresses all of the complaints I listed above:  gradients are subtle, images are smooth, buttons are nicely emphasized, tap areas are correctly sized, and the water background doesn&amp;#39;t look nearly as cheesy.  &lt;/p&gt;
+
+&lt;p&gt;The conclusion here is that EA&amp;#39;s Battleship is absolutely a shapp.  &lt;/p&gt;
+
+&lt;h2&gt;You&amp;#39;re an Indie Dev, but Your App is Topping the Charts! Hire a Designer!&lt;/h2&gt;
+
+&lt;p&gt;Indie Devs, listen:  I&amp;#39;m with you. I understand that designers are expensive, and I get it. But if your app is charting in the paid category, you absolutely have enough cash to get hire a designer. There are even apps that as of now are in the top 10 that clearly have had no design &lt;em&gt;consultation&lt;/em&gt;, let alone full design work. I&amp;#39;m sorry, but most developers are not good designers. That isnt me trying to insult other developers:  I&amp;#39;m not a good designer at all. All I&amp;#39;m saying is that from the developers I know, most are not the best designers themselves.&lt;/p&gt;
+
+&lt;p&gt;Case in point:  &lt;a href=&quot;http://www.shavedham.blogspot.com/&quot;&gt;Big Button Box Pro by Shaved Ham&lt;/a&gt;&lt;br&gt;
+&lt;p class=&quot;centerImage&quot;&gt;&lt;img alt=&quot;Big Button Box Screenshot 1&quot; src=&quot;/images/posts/2010-04-07-shapps/buttonbox1.jpg&quot; width=320 height=480 style=&quot;margin-right: 20px;&quot;&gt;&lt;img alt=&quot;Big Button Box Screenshot 2&quot; src=&quot;/images/posts/2010-04-07-shapps/buttonbox2.jpg&quot; width=320 height=480&gt;&lt;/p&gt;  &lt;/p&gt;
+
+&lt;p&gt;I would &lt;em&gt;kill&lt;/em&gt; to get Five Square as popular as this fucking app. For the record, at the time I am writing this, &amp;quot;Big Button Box Pro&amp;quot; is the 5th post popular paid application on the App Store. Two questions immediately come from that statement. First off, why the &lt;em&gt;hell&lt;/em&gt; is it so popular? Second, people &lt;em&gt;pay&lt;/em&gt; for that thing&amp;#8253; I just don&amp;#39;t understand it.  &lt;/p&gt;
+
+&lt;p&gt;Definitely a shapp.  &lt;/p&gt;
+
+&lt;h2&gt;What the Fuck Were You Thinking&amp;#8253;&lt;/h2&gt;
+
+&lt;p&gt;I saved this category for last just because I think these are the most annoying apps. I don&amp;#39;t &lt;em&gt;think&lt;/em&gt; that I need to explain what this category represents, the example speaks for itself.  &lt;/p&gt;
+
+&lt;p&gt;Case in point:  &lt;a href=&quot;http://www.bitsyapps.com/&quot;&gt;iLeak by joseph wilbur&lt;/a&gt;&lt;br&gt;
+&lt;p class=&quot;centerImage&quot;&gt;&lt;img alt=&quot;iLeak Screenshot&quot; src=&quot;/images/posts/2010-04-07-shapps/ileak.jpg&quot; width=320 height=480&gt;&lt;/p&gt;  &lt;/p&gt;
+
+&lt;p&gt;Write your own damn speech. I think it&amp;#39;s pretty obvious.  &lt;/p&gt;
+
+&lt;p&gt;Okay, I lied. One quick bit of info here. The screenshot above is the only screenshot provided. The description for the app is this (direct quote, nothing removed):  &lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Enjoy the wonderful sounds of leaking things (and people).&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Shapp.  &lt;/p&gt;
+
+&lt;h2&gt;In Conclusion...&lt;/h2&gt;
+
+&lt;p&gt;Stop writing shapps. Actually, scratch that. Stop &lt;em&gt;releasing&lt;/em&gt; shapps and ruining the App Store. I think it is truly remarkable that apps like the ones I&amp;#39;ve posted above got into the App Store, but Five Square 1.0 was originally rejected &lt;em&gt;for using Apple&amp;#39;s Reply icon to symbolize Undo.&lt;/em&gt; I&amp;#39;m not saying that isn&amp;#39;t valuable critique, but there is a time and a place for it. If Apple wants the time and place to be their review table at submission time, that&amp;#39;s fine with me. They just need to hold everyone to the same standard.  &lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;If you can think of any other categories of shapps, or think you have the perfect example for one of the categories above, please let me know in the comments!&lt;/em&gt;  &lt;/p&gt;
+
+&lt;p&gt;[^1]:  When I say &amp;quot;iPhoneOS&amp;quot;, I am referring to &lt;em&gt;any&lt;/em&gt; development targeting the iPhone, iPod Touch, or iPad.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>The Correct Opinion - Code Formatting</title>
+		<link href="http://cartera.me/2010/03/03/the-correct-opinion-code-formatting"/>
+		<updated>2010-03-03T05:00:00-07:00</updated>
+		<id>http://cartera.me/2010/03/03/the-correct-opinion-code-formatting</id>
+		<content type="html">&lt;p&gt;There are several rules I follow when formatting my code, and I&amp;#39;d like to pass them on to you:  take them or leave them. Just keep in mind that this is, in fact, the correct opinion.~  &lt;/p&gt;
+
+&lt;h2&gt;General Rules&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;There is &lt;strong&gt;never&lt;/strong&gt; more then one empty line between any given pair of lines.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;If it can go on one line, then it &lt;strong&gt;does&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;Any characters which are used to &lt;strong&gt;close&lt;/strong&gt; a piece of code that is &lt;strong&gt;multiple lines long&lt;/strong&gt;, should be &lt;strong&gt;on their own line.&lt;/strong&gt; Examples of this include closing braces &amp;#39;&lt;code&gt;}&lt;/code&gt;&amp;#39;, closing parenthesis &amp;#39;&lt;code&gt;)&lt;/code&gt;&amp;#39;, and the end of a multi-line comment &amp;#39;&lt;code&gt;*&amp;#47;&lt;/code&gt;&amp;#39;.&lt;/li&gt;
+&lt;li&gt;Whenever pointers &amp;#39;&lt;code&gt;*&lt;/code&gt;&amp;#39; are used, they should be &amp;#39;attached&amp;#39; to the variable &lt;em&gt;name&lt;/em&gt;, not the variable type. For example, &lt;code&gt;NSString *theString;&lt;/code&gt; is fine, but both &lt;code&gt;NSString* theString;&lt;/code&gt; and &lt;code&gt;NSString * theString;&lt;/code&gt; are not.&lt;br&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Comments&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Comments that describe code should have a space after the &amp;#39;&lt;code&gt;&amp;#47;&amp;#47;&lt;/code&gt;&amp;#39; or &amp;#39;&lt;code&gt;&amp;#47;*&lt;/code&gt;&amp;#39;, but lines of code that are commented out for debugging purposes should not.&lt;br&gt;
+Example:  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;#47;&amp;#47; The following code is courtesy of some other person  
+&amp;#47;&amp;#47;[class runMethod];  
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;All implementation code should be self-documenting whenever possible, so comments explaining code shouldn&amp;#39;t be necessary. If they are, the comment should be brief, and added to the same line as the code file, one space after the &amp;#39;;&amp;#39;. Although brief, they should always be complete sentences, ending with a period.&lt;br&gt;
+Example:  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;TheClass *class = [[TheClass alloc] init]; &amp;#47;&amp;#47; Create an instance of TheClass for us to work with.
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Public headers must be documented with Doxygen-style comments, which follow this syntax:  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;#47;** The first line is a brief, one-sentence description of the function&amp;#47;method.  
+This part describes anything else someone might need to know about the function&amp;#47;method. It can describe the way it works, best practices, etc. and can use multiple sentences. It should be no more then a paragraph in length.
+@param paramName This describes what paramName means in the context of the function&amp;#47;method, in one sentence.  
+@return This describes the return value of the function, and can be multiple sentences if necessary.
+*&amp;#47;  
+- (NSString *)runMethod:(TheParam *)paramName;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Methods&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Individual methods are never separated by a blank line. The only separator allowed for methods is a #pragma mark, and only when that is helpful.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;There is no space before the initial hyphen &amp;#39;&lt;code&gt;-&lt;/code&gt;&amp;#39; or plus sign &amp;#39;&lt;code&gt;+&lt;/code&gt;&amp;#39; at the beginning of the method name, but there is a space after it.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;There is no space between the closing parenthesis &amp;#39;&lt;code&gt;)&lt;/code&gt;&amp;#39; of the return value and the beginning of the method name.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;There is no space between the colon(s) &amp;#39;&lt;code&gt;:&lt;/code&gt;&amp;#39; and the following variable type.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;There is no space between the closing parenthesis &amp;#39;&lt;code&gt;)&lt;/code&gt;&amp;#39; of the variable type and the name of the variable.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;There is a space after a variable in a method name, unless it is the end of the method name.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;In the implementation file, the end of a method name should not be suffixed with a semicolon. There should simply be a single space, and then an opening brace &amp;#39;&lt;code&gt;{&lt;/code&gt;&amp;#39;.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;The variable type in parenthesis (in any part of the method name) should always have a space after it, before the &amp;#39;&lt;code&gt;*&lt;/code&gt;&amp;#39;. This only applies if it is a pointer, of course.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here is an example of a properly formatted method name:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;- (void)runMethodWithParameter:(TheParam *)paramName shouldRunImmediately:(BOOL)runImmediately {   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here are a few examples of how &lt;strong&gt;not&lt;/strong&gt; to format method names:  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; -(void) runMethodWithParameter : ( TheParam*) paramName shouldRunImmediately: ( BOOL) runImmediately; {  
+- (void)runMethodWithParameter:(TheParam *)paramName shouldRunImmediately:(BOOL)runImmediately; {  
+- (void)runMethodWithParameter:(TheParam *)paramName shouldRunImmediately:(BOOL)runImmediately
+ { 
+&lt;/code&gt;&lt;/pre&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Tiger</title>
+		<link href="http://cartera.me/2010/02/08/tiger"/>
+		<updated>2010-02-08T05:00:00-07:00</updated>
+		<id>http://cartera.me/2010/02/08/tiger</id>
+		<content type="html">&lt;p&gt;&lt;a href=&quot;http://cartera.me/blog/wp-content/uploads/DVC00025.jpg&quot;&gt;&lt;img class=&quot;size-full wp-image-224 alignright&quot; style=&quot;float: right;&quot; title=&quot;DVC00025&quot; src=&quot;http://cartera.me/blog/wp-content/uploads/DVC00025.jpg&quot; alt=&quot;&quot; width=&quot;183&quot; height=&quot;243&quot; /&gt;&lt;/a&gt;Last night at approximately 11:30 PM, the strongest and bravest member of my entire family passed away. I know that many families consider their pets to be a second-rate addition, and even a pain at some times: that is not the case in mine. Each one of our &amp;quot;pets&amp;quot; is simply another member of our family that adds just as much to our daily quality-of-life as any human ever has. I spend more time every day with my cats and dogs then with any other living thing, and that is perfectly fine with me. That&amp;#39;s why losing Tiger is so difficult for me, and the rest of my family. Tiger was without a doubt the most compassionate, loving, and kind living thing I have ever been so lucky to spend time with. He was the glue that held our family together so tightly, and one of the few reasons that I woke up in the morning. I&amp;#39;m writing this mostly for my own sake, just so that I never forget what he meant to me, and what he meant to the rest of my family.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://cartera.me/blog/wp-content/uploads/DVC00113.jpg&quot;&gt;&lt;img class=&quot;alignleft&quot; style=&quot;float: left; margin-right: 5px;&quot; title=&quot;DVC00113&quot; src=&quot;http://cartera.me/blog/wp-content/uploads/DVC00113-500x283.jpg&quot; alt=&quot;&quot; width=&quot;300&quot; height=&quot;170&quot; /&gt;&lt;/a&gt;I honestly cannot remember a time when I didn&amp;#39;t have Tiger. He&amp;#39;s been with me for so long, It&amp;#39;s hard to imagine my life without him. It all started in a massive snow storm: he was a stray cat to begin with, and had been captured and put up for adoption at a large pet store. We were there stocking up on animal food before the big storm kept us indoors for a while when we saw him. He looked at my mom in the most amazing way...like he knew that we were the ones. I think they both agreed that our family was meant to bring him home. Unfortunately, we didn&amp;#39;t have nearly enough money on-hand to adopt a cat; we barely had enough to buy the food we needed. When we asked the people at the store if we could come back after the storm for him, they said no, and told us that he was going to be put down within a day if no one adopted him.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://cartera.me/blog/wp-content/uploads/DVC00297.jpg&quot;&gt;&lt;img class=&quot;alignright size-medium wp-image-227&quot; style=&quot;float: right;&quot; title=&quot;DVC00297&quot; src=&quot;http://cartera.me/blog/wp-content/uploads/DVC00297-466x350.jpg&quot; alt=&quot;&quot; width=&quot;280&quot; height=&quot;210&quot; /&gt;&lt;/a&gt;My mom ran across the parking lot to a nearby bank and got enough money out to adopt the cat. She returned out of the horrible blizzard, and we brought him home. The night we first had him, my brother and I (we were quite young) played a game with him, imagining that he was a tiger escaping from the evil people who had captured him and put him in the circus. He did in fact escape, and from then on his name was Tiger.&lt;/p&gt;
+
+&lt;p&gt;From the moment we met him, Tiger was sweet, loving, and kind. He loved everyone unconditionally: there was nothing you could do to make him mad. He had another interesting behavior though: he could always tell when someone was hurt, and would come to help them. Whether it was a physical injury or a bad day at school, he would always know and would always comfort you. If I was in my own bedroom and he was in the basement eating his dinner and I needed someone to comfort me, he would be there in a flash. His ability to know and to comfort is still unparalleled by the best of counselors.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://cartera.me/blog/wp-content/uploads/CIMG1079.jpg&quot;&gt;&lt;img class=&quot;alignleft size-medium wp-image-221&quot; style=&quot;float: left; margin-right: 5px;&quot; title=&quot;CIMG1079&quot; src=&quot;http://cartera.me/blog/wp-content/uploads/CIMG1079-466x350.jpg&quot; alt=&quot;&quot; width=&quot;326&quot; height=&quot;245&quot; /&gt;&lt;/a&gt;As he grew older, his beauty became unimaginable. The grace with which he moved was incredible: it was a joy simply to watch him prowl around the house. His facial features were sharp, but not too sharp, and they were capable of expressing the most complex emotions: happiness, tranquility, love, and most of all, trust. He went through cycles of gaining and losing weight, but it never changed his majestic appearance. He was always well-groomed thanks to his brother Billy, which you could have easily confirmed by smelling his fur or petting his back. He would oftentimes spend hours on end sitting on the couch in the sunlight, warming his fur as well as the hearts of anyone who saw him. I can try to describe his magnificence more through words alone, but a picture can do him more justice, as you can see on the left. Even the picture cannot truly tell the whole story of his beauty; only those who met him and spent time with him can understand it.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://cartera.me/blog/wp-content/uploads/CIMG0257.jpg&quot;&gt;&lt;img class=&quot;alignright size-medium wp-image-213&quot; style=&quot;float: right;&quot; title=&quot;CIMG0257&quot; src=&quot;http://cartera.me/blog/wp-content/uploads/CIMG0257-466x350.jpg&quot; alt=&quot;&quot; width=&quot;209&quot; height=&quot;157&quot; /&gt;&lt;/a&gt;In the past few months Tiger was very sick. He stayed strong until the very end, and by doing so he has proved himself to me as the strongest and bravest cat to ever walk the earth. He brought so much joy and light to my life and to everyone he has touched. It was so sad to see him go. He deserved more then anyone ever good have given him, and I feel so lucky to have received such an amazing gift from him. I wish he could have stayed with us longer.
+&lt;p style=&quot;text-align: center;&quot;&gt;&lt;a href=&quot;http://cartera.me/blog/wp-content/uploads/DVC00105.jpg&quot;&gt;
+&lt;img class=&quot;aligncenter size-full wp-image-225&quot; title=&quot;DVC00105&quot; src=&quot;http://cartera.me/blog/wp-content/uploads/DVC00105.jpg&quot; alt=&quot;&quot; width=&quot;512&quot; height=&quot;384&quot; /&gt;&lt;/a&gt;&lt;/p&gt;&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Five Square 1.0 Rejected</title>
+		<link href="http://cartera.me/2009/12/11/five-square-1-0-rejected"/>
+		<updated>2009-12-11T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/12/11/five-square-1-0-rejected</id>
+		<content type="html">&lt;p&gt;Alright, well Opt-6&amp;#39;s pride and joy, first-born payware appstore app, reason that I wake up in the morning, Five Square has been rejected by Apple for the use of the &amp;quot;Reply&amp;quot; button in the context of &amp;quot;Undo&amp;quot;. I get that it is a valid reason, but this is where we just need to have them send us an email and have us fix it in an update.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Restroom Etiquette</title>
+		<link href="http://cartera.me/2009/10/25/restroom-etiquette"/>
+		<updated>2009-10-25T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/10/25/restroom-etiquette</id>
+		<content type="html">&lt;p&gt;Restroom etiquette is an important topic to cover, and should be treated as such. My parents never taught me much about the complexities that can be found when in a public restroom, and I thought that sharing my own experiences and discoveries might benefit some of you less-experienced people out there. I&amp;#39;ve divided this post into two sections, one for those of you who use restrooms, and one for the rare person that plans&amp;#47;constructs restrooms. Keep in mind that all of this is written from the perspective of a man, so women&amp;#39;s restrooms may not fit into these rules. Enjoy.  &lt;/p&gt;
+
+&lt;h2&gt;Restroom Users&lt;/h2&gt;
+
+&lt;p&gt;To the people who use the restroom in groups:  Don&amp;#39;t talk to each other. I get that you may have been having a conversation as you entered the restroom, but it&amp;#39;s awkward and annoying to have to listen to someone else&amp;#39;s conversations while relieving yourself. I can&amp;#39;t imagine that it would be very difficult for you to simply pause your conversation until you left the room.  &lt;/p&gt;
+
+&lt;p&gt;To those of you who are too cool to wash your hands:  You just touched something that I don&amp;#39;t want to know about, let alone come in second-hand contact with in a few moments. You are about to touch the sink, the paper towel dispenser, and the door handle. It doesn&amp;#39;t take that long, so please just wash your hands. As a side note for this rule, I&amp;#39;d like to commit to something:  if I see you fail to wash your hands, and then touch me or anything others may touch, I will personally dunk your hands in gasoline and light them on fire. Thanks!  &lt;/p&gt;
+
+&lt;p&gt;To old men and eager children:  Don&amp;#39;t make noises when you&amp;#39;re relieving yourself. The last thing I ever want to hear is a large sigh coming from the urinal next to me. It&amp;#39;s disgusting, unnerving, and just plain rude. I know you can avoid it, so just don&amp;#39;t do it.  &lt;/p&gt;
+
+&lt;p&gt;To anxious people that only care about themselves:  If a stall&amp;#47;door is locked, don&amp;#39;t knock. This is very simple. If the door won&amp;#39;t open, there&amp;#39;s a reason for that. Knocking only communicates to the person inside the following message:  &lt;em&gt;&amp;quot;Hey! You know, I&amp;#39;m out here...and you should hurry up!&amp;quot;&lt;/em&gt; In other words, it&amp;#39;s just rude. By trying to open the door and realizing it&amp;#39;s locked, you&amp;#39;ve already let me know that you&amp;#39;re there. Knocking just proves that you&amp;#39;re there, and you&amp;#39;re a douchebag.  &lt;/p&gt;
+
+&lt;h2&gt;Restroom Planners&lt;/h2&gt;
+
+&lt;p&gt;First and foremost (only relevant to men):  Put dividers between the urinals. I cannot imagine that skimping out on that can save you that much cash. I can&amp;#39;t tell you how uncomfortable it makes me feel to know that another man can look to the left or right and see...well, you know. It&amp;#39;s just disturbing.  &lt;/p&gt;
+
+&lt;p&gt;I&amp;#39;d also like to request that you include paper towels. I get that sometimes air driers make some amount of sense, but there are times when they just piss me off. Why don&amp;#39;t you just include both? Then the people with nothing better to do can sit around and wait for their hands to dry, and I can be out the door and back to my life quicker.  &lt;/p&gt;
+
+&lt;p&gt;That&amp;#39;s all for now, but I&amp;#39;ll probably add more as my frustration gets worse.  &lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Canabalt is the Perfect Game</title>
+		<link href="http://cartera.me/2009/10/11/canabalt-is-the-perfect-game"/>
+		<updated>2009-10-11T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/10/11/canabalt-is-the-perfect-game</id>
+		<content type="html">&lt;p&gt;&lt;a title=&quot;Canabalt Home Screen by CarterA, on Flickr&quot; href=&quot;http://www.flickr.com/photos/33672094@N07/3999572734/&quot;&gt;&lt;img src=&quot;http://farm3.static.flickr.com/2460/3999572734_ae54474bea_o.png&quot; alt=&quot;Canabalt Home Screen&quot; width=&quot;480&quot; height=&quot;320&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;The Prelude&lt;/h2&gt;
+
+&lt;p&gt;I recently purchased a new game for my iPhone: &lt;em&gt;Canabalt&lt;/em&gt;. It was initially recommended by John Gruber, writer of Daring Fireball. After Mr. Gruber recommended the game, I decided to at least try it: his taste is usually quite good. I picked it up from the App Store, but let it sit lonely on my home screen for several days before actually trying it. I had bought it during a busy week, and it was easily forgotten whilst sitting on my third home screen (my third home screen page is reserved for apps with &amp;#39;less-then-exceptional&amp;#39; icons.)  &lt;/p&gt;
+
+&lt;p&gt;But more recently, my good friend George remarked that it was an incredibly fun and addicting game. Remembering my purchase, I was quick to lie and say that I also loved it, and had been playing it quite a bit in my spare time. I&amp;#39;d say I came off sounding quite nice in that case, even though it was a complete lie.  &lt;/p&gt;
+
+&lt;p&gt;I only lied about it because I was embarrassed about buying it and never even trying to play. I didn&amp;#39;t want to seem like buying apps was a frivolous process for me, something I do without thought, even though it really is. I suppose that covering this up really is pointless, considering how many apps I own (roughly 175 at the moment.)  &lt;/p&gt;
+
+&lt;h2&gt;The Story&lt;/h2&gt;
+
+&lt;p&gt;The storyline, or what I have gathered about it, is that you are escaping a location, and doing so by jumping across the tops of buildings through a post-apocolyptic city. I&amp;#39;m not sure what you are escaping from, but judging by the background of the game (by which I mean the actual background images) you are fleeing some sort of destructive robotic attack.  &lt;/p&gt;
+
+&lt;p&gt;I could go on with more of my own speculation, but I think that one of the great parts of this game is that it is completely open-ended. The world of &lt;em&gt;Canabalt&lt;/em&gt; is whatever you make of it. It lets you create your own version of the storyline to match whatever scenario you&amp;#39;d like. So try the game out, and see what you make of it.  &lt;/p&gt;
+
+&lt;h2&gt;The Game&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;Canabalt&lt;/em&gt; is deceptively simple in its gameplay, but has many small details hidden in every aspect of the game. These additions make the game addictive, enjoyable, and most of all, unique every time.  &lt;/p&gt;
+
+&lt;p&gt;The game is quite simply a fast-paced side scroller, where you do not have control over acceleration or direction, only when to jump. This is one of the great parts of the game, which you can read more about in the &lt;strong&gt;Controls&lt;/strong&gt; section below.  &lt;/p&gt;
+
+&lt;p&gt;&lt;a title=&quot;Canabalt Gameplay Screen by CarterA, on Flickr&quot; href=&quot;http://www.flickr.com/photos/33672094@N07/3999572762/&quot;&gt;&lt;img src=&quot;http://farm3.static.flickr.com/2434/3999572762_c707ccf3ed_o.png&quot; alt=&quot;Canabalt Gameplay Screen&quot; width=&quot;480&quot; height=&quot;320&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;The scoring system is based on one measurement: distance run. The idea is that the farther you can get away from whatever it is you are escaping, the better you have done. You have to time your jumps perfectly so that you don&amp;#39;t overshoot a building, or end up running straight off the edge. The speed at which you&amp;#39;re running will go up if you can run for longer periods of time without running into things. There are some rather large obstacles that sometimes fall from the sky: they&amp;#39;ll kill you if you run into them. But there are also crate-like obstacles (I think that some of them resemble air conditioning units) that get in your way. They won&amp;#39;t kill you, but they will slow you down. This is usually a bad thing, but it can be a good idea at times, especially if you&amp;#39;re finding it difficult to make jumps fast enough. But watch out: if you&amp;#39;re too slow, you may not be able to make it across some of the larger gaps.  &lt;/p&gt;
+
+&lt;h2&gt;The Controls&lt;/h2&gt;
+
+&lt;p&gt;The controls of &lt;em&gt;Canabalt&lt;/em&gt; are dead simple, and that is where their elegance lies. The iPhone platform is hugely popular because of the complex controls that it offers, including multi-touch gestures, accelerometer, and more: but sometimes they can all get to be a little much. I am often frustrated with other games that require so much thought before actually using controls (&lt;em&gt;What would shaking do right now? What would happen if I put two fingers on the screen instead of one?&lt;/em&gt;) and &lt;em&gt;Canabalt&lt;/em&gt; fixes that by simply having one control. When you want to jump, you tap. You can tap anywhere on the screen, for any amount of time, and with whatever number of fingers you&amp;#39;d like. No matter what, a tap will make you jump. There is no confusion, no learning curve.  &lt;/p&gt;
+
+&lt;h2&gt;Getting There&lt;/h2&gt;
+
+&lt;p&gt;Many games require startup, a selection from a menu, another menu or two, and then a loading screen before you can begin playing. This is all well and good on a real console, but on my phone I&amp;#39;d like a game to be ready to play when I am. From the moment I decide I would like to play &lt;em&gt;Canabalt&lt;/em&gt; (starting at my home screen) it takes 13 seconds for me to start actually playing the game. In sharp contrast, it takes me about 30 seconds to get up and running with the ever-popular &lt;em&gt;geoDefense Swarm&lt;/em&gt; (not to say that I don&amp;#39;t absolutely love that game as well.) Even the great &lt;em&gt;Ramp Champ&lt;/em&gt; takes about 20-25 seconds to get up and running, from the home screen. This small amount of time may seem minor, but it makes the game feel much more responsive and ready-to-go.  &lt;/p&gt;
+
+&lt;h2&gt;Graphics&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/33672094@N07/3998808711/&quot; title=&quot;Canabalt Game Over Screen by CarterA, on Flickr&quot;&gt;&lt;img src=&quot;http://farm4.static.flickr.com/3497/3998808711_554602b2ba_o.png&quot; width=&quot;480&quot; height=&quot;320&quot; alt=&quot;Canabalt Game Over Screen&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Some may criticize &lt;em&gt;Canabalt&lt;/em&gt; for using pixel graphics: I am not one of those people. Pixel art is extremely impressive, when done well. This is a case where I&amp;#39;d say it has been done very tastefully. It accents the side scroller aspect of the game, giving it a slightly dated yet still very modern feel. The background of the game is also in constant motion, and has details that are only available to the quick eye. Or the slower eye, if you&amp;#39;re willing to die while looking.  &lt;/p&gt;
+
+&lt;p&gt;The main character is a small black and white man. He may at first seem simple, but you will find that his body bends when he jumps, and he will oftentimes land and do a front-flip before continuing to run. Almost as if he was showing off for someone. In any case, the game is extremely detailed, and worth playing even just for the incredible graphics.  &lt;/p&gt;
+
+&lt;h2&gt;Sound&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/33672094@N07/3999572658/&quot; title=&quot;Canabalt Startup Screen by CarterA, on Flickr&quot;&gt;&lt;img src=&quot;http://farm3.static.flickr.com/2668/3999572658_bbfe9765cc_o.png&quot; width=&quot;480&quot; height=&quot;320&quot; alt=&quot;Canabalt Startup Screen&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;That is the screen that &lt;em&gt;Canabalt&lt;/em&gt; displays while starting up, and it does not lie. The full experience of Canabalt is lost without the sound effects, and they are not done justice when played off of the iPhone speakers. After donning my Sennheiser headphones and turning up the volume I was instantly immersed in the world of &lt;em&gt;Canabalt&lt;/em&gt;. Although the soundtrack can get repetitive after long periods of time, it&amp;#39;s really best to play in short bursts: carpal tunnel syndrome is a serious problem.  &lt;/p&gt;
+
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;This game fits in perfectly on the iPhone. It is simplistic yet detailed, and gameplay is smooth. I haven&amp;#39;t had it crash at all, which is a feat all by itself considering how temperamental my iPhone can be.  &lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Changing Leopard&apos;s Spots</title>
+		<link href="http://cartera.me/2009/08/17/changing-leopards-spots"/>
+		<updated>2009-08-17T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/08/17/changing-leopards-spots</id>
+		<content type="html">&lt;p&gt;I&amp;#39;d like to take a moment to explain some things that seem to not be properly understood here.  &lt;/p&gt;
+
+&lt;p&gt;Firstly, the reason that Leopard theming isn&amp;#39;t nearly as broad is because of the &lt;em&gt;complete&lt;/em&gt; difference between the theming methods. I&amp;#39;m not talking about the theme resource files:  I&amp;#39;m talking about the way the theme is applied. ShapeShifter themed your system by changing code at runtime so that applications used images provided by the themer, drawn as specified by the theme, instead of the system-provided content. That is why ShapeShifter relied on the Application Enhancer, and did not simply work through system file replacement. It is worth noting that this was not a requirement for Tiger theming, as it is in Leopard:  in Tiger, file replacement offered a complete theming solution.  &lt;/p&gt;
+
+&lt;p&gt;At first, one of the major problems holding back developers from making a ShapeShifter equivalent on Leopard was the lack of a functional replacement&amp;#47;update to APE (Application Enhancer. Without APE, a developer cannot write code to patch both Cocoa and Carbon apps at the same time. Well, that is not entirely true. There is a system known as mach_inject that can inject code into both types of applications. Using mach_inject is difficult, to say the least, as developers have to have multiple sets of code, one in C and one in Objective C (for Carbon and Cocoa, respectively), and then optimizing code can get even more complicated, as memory issues arise when sharing allocated space with code that developers cannot always predict. It is worth noting that the same memory issues arise when using APE as well.  &lt;/p&gt;
+
+&lt;p&gt;Now that APE has been released for Leopard, there is a new opportunity for developers to create runtime theming systems. Of course, with the addition of the half-ass CoreUI framework, any code that was written for runtime patching in Tiger is no longer feasible for use in Leopard. Gnome developed a still-unreleased runtime themer, based off of APE, that can modify the titlebar gradient, controls, and text color. It is unpolished, and has huge memory management issues, thus it still hasn&amp;#39;t been released. Optimizing code that is used in every single application is an extremely difficult process, and thus very time consuming.  &lt;/p&gt;
+
+&lt;p&gt;The reason that Kameleon 2.0 was never released was due to the difficulties that were being caused by the system-file-replacement system that we had started with as a base. Replacing system files is a permanently flawed system, and continues to show its problems as operating systems migrate to more code&amp;#47;vector-based interface systems. For instance, the entire HUD system that the system uses is drawn entirely based on code, thus replacing system files will never be able to theme those windows. After trying to find small workarounds for the existing file replacement system, and failing, gnome and I decided it simply wasn&amp;#39;t worth the time to continue working on a system that was so fundamentally flawed. We (and by we, I mean mostly gnome) began work on what was jokingly called the Kaped Krusader, which was, and still is, a barebones APE module which can, as I said before, edit the last two un-themeable elements.  &lt;/p&gt;
+
+&lt;p&gt;It is also worth noting that in Snow Leopard, it is widely accepted that the base interface will be migrating from the intermediary ArtFile system, over to the fully vector-based system. The vector UI system is actually quite genius, and provides an excellent way of theming. UI elements are drawn based on &amp;quot;recipes&amp;quot; which tell the framework how to draw the control. If some amazing programmer could create a program that allowed designers to create a raster-based button, and then generate a recipe that would be compatible with CoreUI, that developer would have found the key to the continued theming of the operating system. But being able to decode the 10.6 versions of the artfiles really doesn&amp;#39;t matter, especially considering how simple is was to decode the Leopard artfiles. Don&amp;#39;t tell me it wasn&amp;#39;t, gnome wrote his own artfile decoder in about a week. ;)  &lt;/p&gt;
+
+&lt;p&gt;I am still trying to find a way to move away from our dependence on Unsanity:  not that I don&amp;#39;t greatly admire their products. They continue to surprise me with the quality of their work. Their issue is timing. They are finally releasing working copies of their software, right before the next huge OS upgrade. It is impossible to write an app that depends on something so very inconsistent. I&amp;#39;ve been considering using Infinite Labs&amp;#39; PlugSuit system for injection:  but again, it is based off of mach_inject which will still break in snow leopard.  &lt;/p&gt;
+
+&lt;p&gt;There we go. Feels good to clear some of that up.  &lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>District 9</title>
+		<link href="http://cartera.me/2009/08/15/district-9"/>
+		<updated>2009-08-15T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/08/15/district-9</id>
+		<content type="html">&lt;p&gt;A few moments ago, I was sitting in a movie theater, as the lights came up and the credits rolled. I sat motionless for a while, simply considering what I had just seen. &lt;em&gt;District 9&lt;/em&gt; was an incredible film. It drew my in from the moment it began, with its stunning realism and harsh effects. The film itself was shocking. I went into that theater expecting a fairly good science fiction movie: I had no idea that it would be such a shockingly impressive feat of filmmaking. It combines a very well done science fiction premise with an extremely real setting. I think that the utter realism of the movie is what makes it resonate so deeply with me.&lt;/p&gt;
+
+&lt;p&gt;I came out of the theater thinking to myself that what really disturbed me about the movie was how very real it was. I could easily imagine the exact scenario that played out in the movie happening on our planet now. It is human nature, seemingly, to instantly reject and hate any new being that somehow challenges our current stance as the most powerful life on the planet. One small element, just tossed out by one of the interviewees, was particularly shocking. They mention that the MNU, the organization which is on the forefront of relations and supposed humanitarian acts towards the aliens, is also the world&amp;#39;s top weapons manufacturer. It suddenly made everything make sense to me: the aliens have advanced weaponry, thus they instantly draw intrigue and assistance from us. What saddens me is that this is true, and would easily happen in our current world.&lt;/p&gt;
+
+&lt;p&gt;I would not recommend this movie to the faint-of-heart, or those of you who are squeamish about violence and gore. This movie is brutal, and harsh, but if you can handle it, it is definitely worth seeing.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>I Dream in Code</title>
+		<link href="http://cartera.me/2009/08/02/i-dream-in-code"/>
+		<updated>2009-08-02T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/08/02/i-dream-in-code</id>
+		<content type="html">&lt;p&gt;A few days ago, my brother woke me up. I was very intent on telling him that I had solved his code error: he had forgotten a semicolon. Now, a bit of background here. My brother doesn&amp;#39;t program. He never has, and never will. Also, the easiest error to make when programming in Objective-C (which I do) is to forget to append every line with a semicolon. Thus, I probably meant to make him feel dumb about his amateur coding mistake: if he had actually made it.&lt;/p&gt;
+
+&lt;p&gt;He met my odd comment with absolute confusion. A few moments after he didn&amp;#39;t instantly understand what I meant, I realized that there was something strange going on. I then tried to think back to &lt;em&gt;why&lt;/em&gt; I had told him this in the first place: and I couldn&amp;#39;t come up with the reason. Thus, the trigger for my strange actions must have stemmed from a dream. A dream about code.&lt;/p&gt;
+
+&lt;p&gt;This, my friends, is a whole new level of obsession. Of all the things I&amp;#39;ve ever done relating to programming, this takes the cake. I&amp;#39;ve stayed up past 3AM trying to solve an exception, and I&amp;#39;ve actually pulled hair out of my head looking at a frozen application, but never before have I &lt;em&gt;dreamt&lt;/em&gt; about code. It surprises even me, and my middle name is OCD.&lt;/p&gt;
+
+&lt;p&gt;I suppose the reasoning behind this is probably the fact that I haven&amp;#39;t been able to get the xMod table view working properly yet. But that is definitely &lt;em&gt;not&lt;/em&gt; a simple error to fix...unless my subconscious knows more about NSCells than I do.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Programming a Menu Bar Button</title>
+		<link href="http://cartera.me/2009/06/26/programming-a-menu-bar-button"/>
+		<updated>2009-06-26T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/06/26/programming-a-menu-bar-button</id>
+		<content type="html">&lt;p&gt;New tutorial by me at I Love Code:  &lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://iloveco.de/menu-bar-button/&quot;&gt;Enjoy!&lt;/a&gt;&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>New Music #3</title>
+		<link href="http://cartera.me/2009/06/24/new-music-3"/>
+		<updated>2009-06-24T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/06/24/new-music-3</id>
+		<content type="html">&lt;p&gt;Thought I would put out another list of my current favorite bands&amp;#47;albums.  &lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Saving Abel&lt;/strong&gt;: I started listening to them because I&amp;#39;ll be seeing them in concert with Nickelback, Papa Roach, and Hinder. They only have one album out currently, but it is quite a solid record. Starting out fast with &lt;em&gt;New Tattoo, *and then treating you to great hybrid songs like *Addicted&lt;/em&gt;, &lt;em&gt;18 Days&lt;/em&gt;, and &lt;em&gt;In God&amp;#39;s Eyes&lt;/em&gt;, their self-titled album can definitely keep you hooked through the entire thing. It goes out with an excellent , much grungier song than the rest, &lt;em&gt;Beautiful You&lt;/em&gt;. Overall, the album itself is a great, fluid piece, and the band itself has definite potential and skill. Unlike many bands these days, where the vocalists rely heavily on special mixing to sound even close to acceptable, Jared Weeks (lead singer for Saving Abel) has a unique, and catchy voice that gives the band a great sound, different from most others in their genre.  &lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Shinedown&lt;/strong&gt;: I&amp;#39;ve had a couple songs by Shinedown in my library for quite a while (namely &lt;em&gt;45 *and *Fly From the Inside&lt;/em&gt;, both from Leave a Whisper.) I enjoyed these songs, but it never really occurred to me to look at more from Shinedown. It took one of my friends, George seeing &lt;em&gt;Second Chance&lt;/em&gt; in the iTunes Top 10 for me to actually take notice of this previously-ignored band. I bought Sounds of Madness, their newest album (which has the top 10 song in it) and immediately fell in love with this band. The singer has a great voice, much deeper than that from Saving Abel, but not quite as disgustingly rough as Chad Kroeger from Nickelback. The guitar and bass from the opening 4 songs in the album is excellent, and will instantly wake you up if you happen to be drifting off. After a quick pause for a few slow songs, they come revving back up with a great song, with the cheesiest name and chorus ever known to man. I&amp;#39;ll leave you to look it up for yourself. After that, there are a few more excellent quick songs, and then the 3 bonus tracks will not disappoint.  &lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Halestorm&lt;/strong&gt;: I just started listening to them today, and I have to say, they have become my guilty pleasure (music-wise, perverts.) Although some regard them as a disgrace to Rock, for their slant towards the awful &amp;quot;genre&amp;quot; that is Pop, I completely disagree. Quite frankly, I&amp;#39;d say that is simply sexism. The singer for Halestorm is a woman, and thus people seem to instantly assume we have another Britney Spears (but this time dressed as a rocker.) Oh, and a small bit of my enjoyment for this band definitely stems from the fact that there is something intrinsically attractive about a woman that can do some insane shredding on that Flying V.  &lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Where do my app&apos;s settings go?</title>
+		<link href="http://cartera.me/2009/06/20/where-do-my-apps-settings-go"/>
+		<updated>2009-06-20T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/06/20/where-do-my-apps-settings-go</id>
+		<content type="html">&lt;p&gt;I can&amp;#39;t decide. Showoff needs preferences in it, but I am getting two totally different opinions on where iPhone app settings should be placed. Do they get stuck inside Settings.app, or do I add yet another button to my app and put them in the app itself? Opinions, anyone?&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Why are my shoes considered free ad space?</title>
+		<link href="http://cartera.me/2009/06/18/why-are-my-shoes-considered-free-ad-space"/>
+		<updated>2009-06-18T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/06/18/why-are-my-shoes-considered-free-ad-space</id>
+		<content type="html">&lt;p&gt;In general, unless you&amp;#39;re buying designer clothes, the brand of a piece of clothing is fairly subtly added to your clothes. This is advertising, but it isn&amp;#39;t extremely obvious or obnoxious. This of course changes when you buy designer clothes, but I&amp;#39;m not a poser: so that doesn&amp;#39;t really apply to me.  &lt;/p&gt;
+
+&lt;p&gt;Despite this general rule, even the cheapest, most basic pair of Nike sneakers have the Nike logo and name plastered across almost every inch of the shoe. Why are shoes exempt from the &amp;quot;no obvious branding on clothing&amp;quot; rule? No clue. But I for one would rather not be walking around on a pair of billboards.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Seven Ways to Tell if Your Band is Too Old</title>
+		<link href="http://cartera.me/2009/06/13/seven-ways-to-tell-if-your-band-is-too-old"/>
+		<updated>2009-06-13T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/06/13/seven-ways-to-tell-if-your-band-is-too-old</id>
+		<content type="html">&lt;ol&gt;
+&lt;li&gt;Your hair is longer than your most recent concert tour.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;The pitch of your singing is almost as high as you were last night.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;When you want to check your popularity, you look at the Billboard charts.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;You still add meaning to your lyrics.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;You think that an album cover still needs to be as big as a record.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;You think that naming a song &amp;quot;Paradise City&amp;quot; is totally badass.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Your hearing aid is set louder than your amp.&lt;br&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Comment with any more you can think of.  &lt;/p&gt;
+
+&lt;p&gt;Here are a few that commenters said that were excellent:  &lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;You&amp;#39;ve smoked more cigarettes this week than you have sold copies of your latest album.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;They&amp;#39;ve named a hairstyle after you.&lt;br&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Graduation</title>
+		<link href="http://cartera.me/2009/06/04/graduation"/>
+		<updated>2009-06-04T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/06/04/graduation</id>
+		<content type="html">&lt;p&gt;I graduated today! Woo! I looked pretty spiffy in my black tux with my pink vest, if I do say so myself. Anyways, I gave a speech. Here it is, in the form that I read:  &lt;/p&gt;
+
+&lt;blockquote&gt;    This year our continuation speeches were supposed to be imaginative. Something different than the usual list of thank yous. A speech that would be memorable for content, but also for presentation. A poem, a story, a metaphor, an interpretive dance:  anything but yet another list.
+    None of those options appealed to me. If I did something too out-of-the-ordinary, I wouldnt be able to get across the right message and thank the right people. Thus, Ive decided to stick with the status quo. I will do what hundreds of students have done before me, and thank the people that have helped me out through my journey. This speech may not by imaginative, creative, or new in any way:  but at least itll go against the guidelines. And that counts for something.
+    Ill begin my list by thanking my mom, Dina Allen. She taught me to question unjust rules (or guidelines), and to not be concerned with breaking them, especially when youre planning on driving away in a limo afterwards.
+    Next Id like to mention my dad, Philip Allen. Youve been a great friend and mentor to me, for my entire life:  thank you so much for the time youve given me.
+    I would also like to thank a product also shaped by Logan, my brother:  Austin Allen. Austin:  Youve been more of an influence on my life than you could ever imagine. Youve been there when I needed a brother, and more importantly, youve always been there when I just needed a friend.
+    Thats all of my immediate family, but Id also like to thank the two extensions of my family that have stuck with me for the past year and a half. My best friends, William and George. William, youve been the most dependable and selfless person Ive ever had the pleasure of knowing:  even when I didnt deserve your kindness, you gave it to me. George, people say were the same person:  I disagree. I would never understand myself as well as you understand me. Thank you so much, both of you, for standing by me:  no matter how hard the road got.
+    And through my years at Logan, a few other people that Ive worked with have really stood out. My little buddies, Aiden, Teddy, and Nate:  you three taught me how to be patient, and how to be a role model. Mark Suzuki and Zach Fisher, you both have always treated me as a peer, had in-depth discussions with me, and helped me to understand and form my own opinions on issues in the world. Justine Zollo, you gave me the gift of an incredible awareness. You opened my eyes to the worlds flaws, and how I could work to remedy them. And finally, Eric Benson, you mentored me through years of math and science, helped me on extra projects, and most of all, you believed in me.
+    I leave this school now with a heightened intellect, and a greater awareness of the world I live in. I leave with the abilities and mindset that I need to change the world to be a better place. And I leave behind a hope that this school will continue to give students these amazing gifts:  the world needs them.&lt;/blockquote&gt;
+
+&lt;p&gt;If you read this far, good job.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>NIИ</title>
+		<link href="http://cartera.me/2009/05/27/nin"/>
+		<updated>2009-05-27T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/05/27/nin</id>
+		<content type="html">&lt;p&gt;Just got back from a NIИ (Nine Inch Nails) concert. Oh. My. God. Coolest thing ever. Life is good.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>RSS Feeds</title>
+		<link href="http://cartera.me/2009/05/25/rss-feeds"/>
+		<updated>2009-05-25T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/05/25/rss-feeds</id>
+		<content type="html">&lt;p&gt;Hey all, just a quick bit of blog-related news for you. I changed the RSS settings for the blog so that it is now using Feedburner. This allows me to get stats about how many people read my blog consistently, what posts are more popular, etc. This means that if you subscribe to the old RSS feed, you should move to the new one. The links on the site are updated for the new feed, but for you lazy folk, here is a direct link:  &lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;feed://feeds2.feedburner.com/CarterAllensBlog&quot;&gt;RSS 2.0&lt;/a&gt;  &lt;/p&gt;
+
+&lt;p&gt;Enjoy!&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Angels and Demons, Terminator Salvation</title>
+		<link href="http://cartera.me/2009/05/24/angels-and-demons-and-terminator-salvation"/>
+		<updated>2009-05-24T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/05/24/angels-and-demons-and-terminator-salvation</id>
+		<content type="html">&lt;p&gt;Haven&amp;#39;t reviewed any movies recently, though I would talk about the two I&amp;#39;ve seen in the past week.  &lt;/p&gt;
+
+&lt;h2&gt;Angels and Demons&lt;/h2&gt;
+
+&lt;p&gt;I really enjoyed this movie. The book is one of my all-time favorite reads, and I&amp;#39;m happy with the movie&amp;#39;s representation of it. It can&amp;#39;t really live up to it at all, but it did its best. The action sequences were well-choreographedand exciting, and the acting was solid. The plot was a bit difficult to follow, probably due to the amount of characters and elements that were cut out from the book. Overall, it is a movie I would recommend to most people.  &lt;/p&gt;
+
+&lt;h2&gt;Terminator Salvation&lt;/h2&gt;
+
+&lt;p&gt;The plot for this movie was really difficult to follow, of course, I haven&amp;#39;t seen any of the other movies. That is probably why. But apart from that, the action sequences were intense and well-done. The pyrotechnics were elaborate, and sometimes excessive, yet I still enjoyed them. I have to say, I cracked up when the terminator&amp;#47;person thing was in the computer room, and the screen said &amp;quot;Sync Complete.&amp;quot; I half expected it to start verifying. Ah well. Overall, good only for the action. Nothing else really of value in it.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Sidebar Icons</title>
+		<link href="http://cartera.me/2009/05/23/sidebar-icons"/>
+		<updated>2009-05-23T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/05/23/sidebar-icons</id>
+		<content type="html">&lt;p&gt;I spent a really long time last night redoing a bunch of icons on my computer. All the 16px states are courtesy of Susumu Yoshida, and the larger folders are from Pry Frente, by Jonas Rask.
+&lt;img src=&quot;http://www.opt-6.com/grabup/861e22b492b877bb969bff36faf6b4ff.png&quot; alt=&quot;Finder window&quot; /&gt;
+&lt;img src=&quot;http://www.opt-6.com/grabup/000f2375e894fa57ce8f72af04224b2a.png&quot; alt=&quot;Finder window 2&quot; /&gt;&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>About</title>
+		<link href="http://cartera.me/2009/05/23/about"/>
+		<updated>2009-05-23T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/05/23/about</id>
+		<content type="html">&lt;p&gt;Updated the About page with my card. Enjoy.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Carbon Offsets</title>
+		<link href="http://cartera.me/2009/05/18/carbon-offsets"/>
+		<updated>2009-05-18T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/05/18/carbon-offsets</id>
+		<content type="html">&lt;p&gt;I was reading through a thread in a forum online, and someone was mentioning carbon offsets. I haven&amp;#39;t ever really researched them, but they always sounded like a great concept to me.  &lt;/p&gt;
+
+&lt;p&gt;Someone on this forum then pointed out that years ago, the Catholic church would sell &amp;quot;indulgences&amp;quot; to rich folk. Basically, they were selling the ability for someone to sin without punishment or guilt.  &lt;/p&gt;
+
+&lt;p&gt;My question to all of you is, are these two systems the same? Are we buying the ability to be guilt-free?&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Trip Journal</title>
+		<link href="http://cartera.me/2009/05/13/trip-journal"/>
+		<updated>2009-05-13T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/05/13/trip-journal</id>
+		<content type="html">&lt;p&gt;I&amp;#39;ve gotten sick of telling people about my recent trip, so I&amp;#39;ve given up. In light of this, I&amp;#39;ve just uploaded pictures of my trip journal pages. Keep in mind, there are many more of them, all of which suck a lot more than these. &lt;a href=&quot;http://www.flickr.com/photos/33672094@N07/sets/72157617976646395/&quot;&gt;Enjoy&lt;/a&gt;.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Redesign Complete</title>
+		<link href="http://cartera.me/2009/05/10/redesign-complete"/>
+		<updated>2009-05-10T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/05/10/redesign-complete</id>
+		<content type="html">&lt;p&gt;I know that I&amp;#39;ve had this new look going for a while now, but it is finally complete now, with the addition of my new personal logo. Hope everyone likes the new theme!&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Entitlement</title>
+		<link href="http://cartera.me/2009/04/21/entitlement"/>
+		<updated>2009-04-21T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/04/21/entitlement</id>
+		<content type="html">&lt;p&gt;Most people have heard that the iTunes Music Store is raising prices on a ton of songs. People are quite pissed at the 30 cent increase in price. I don&amp;#39;t get it. Since when were people entitled to 99 cent songs? Have you ever tried to buy a real CD? It&amp;#39;s not like that happens in a record store. And people dislike the variations in the pricing. When you go to a record store, is the brand new release of the popular band more expensive than the month-old releases by the B-rated band? Yep. this is just bringing more complexity to a market that wasn&amp;#39;t working perfectly. And the artists get more money which is good.  &lt;/p&gt;
+
+&lt;p&gt;Also, something to consider is the lack of song DRM. Even in my small circle of friends, I&amp;#39;m already seeing more sharing of music. I&amp;#39;m against this at a large scale, and it bugs me. In essence, iTunes has to account for the fact that every purchased copy of the music may very well end up on 5-10 computers, or more if it gets put up on a torrent. Even if you don&amp;#39;t pirate music, we all have to pay for them. It&amp;#39;s not fair, but it is the only way the artists are going to get fed. And we like our artists well-nourished.  &lt;/p&gt;
+
+&lt;p&gt;So my overall opinion: suck it up. The economic collapse is affecting everyone, the artists need to eat, and piracy of music is rampant. 30 cents per song isn&amp;#39;t that much, deal with it.  &lt;/p&gt;
+
+&lt;p&gt;Added note: As a reader pointed out to me, this is all only the case if more of the revenue from higher priced songs goes to the artists. I&amp;#39;ve searched for a while now and can&amp;#39;t find the actual figures for artist compensation when songs are bought on iTunes. If someone could comment about this, I&amp;#39;d be much obliged.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Understanding Object-Oriented Programming and the MVC System</title>
+		<link href="http://cartera.me/2009/04/15/understanding-object-oriented-programming-and-the-mvc-system"/>
+		<updated>2009-04-15T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/04/15/understanding-object-oriented-programming-and-the-mvc-system</id>
+		<content type="html">&lt;p&gt;&lt;h3&gt;Introduction&lt;/h3&gt;
+Before you begin to learn the basic syntax of Cocoa (the API created by Apple for writing desktop Mac applications in Objective-C), you must first gain a firm grasp of the following two concepts:&lt;br /&gt;
+&amp;nbsp; a. Object Oriented Programming&lt;br /&gt;
+&amp;nbsp; b. The Model-View-Controller System (MVC)&lt;br /&gt;
+Object Oriented programming is a way of writing code that allows you to create multiple &amp;quot;objects,&amp;quot; which each have properties, and actions that they can perform. The MVC System provides a basic guideline for organizing a project with multiple classes that each perform specialized tasks.&lt;br /&gt;
+&lt;h3&gt;Object Oriented Programming&lt;/h3&gt;
+I&amp;#39;m going to go out on a limb here and use a car analogy. Ever model of car has its own blueprint, which the manufacturer uses to build lots of copies of this same type of car. Yet once each car has been created, it is given its own defining features, such as color, drive, and location. The owner can customize their car by doing lots of unique actions to it (painting it a new color, replacing the seats, etc.) But no matter how much the owner customizes their car, it is still based off of the original blueprint that was created by the manufacturer.&lt;br /&gt;&lt;br /&gt;
+Jump time. The blueprints that the manufacturer used to make lots of copies of this same model of car are now called &lt;em&gt;classes&lt;/em&gt;. Each car is now an &lt;em&gt;object&lt;/em&gt;, and each &lt;em&gt;object&lt;/em&gt; is an &lt;em&gt;instance&lt;/em&gt; of the &lt;em&gt;class&lt;/em&gt;. All of the little defining features of each car, those are &lt;em&gt;variables&lt;/em&gt;. And the little actions that the owner takes to customize the car, those are &lt;em&gt;methods&lt;/em&gt;.&lt;br /&gt;&lt;br /&gt;
+Take a deep breath, that&amp;#39;s a lot to take in in such a short amount of time. Lets go over it again, shall we?&lt;br /&gt;
+&amp;nbsp; Class:  A blueprint. A definition of how an object can be created.&lt;br /&gt;
+&amp;nbsp; Object:  An instance of a class. In other words, something built from a certain blueprint.&lt;br /&gt;
+&amp;nbsp; Instance:  An object that was created using a class as a blueprint. For instance, for the car analogy, a Porsche 911 owned by myself (I wish) would be an &lt;em&gt;instance&lt;/em&gt; of the Porsche 911 class.&lt;br /&gt;
+&amp;nbsp; Variable:  A property of an object. Something that defines it. In the car analogy, the color of the car would be a variable.&lt;br /&gt;
+&amp;amp;nbsp Method:  An action that something can take that changes a variable of an object. Using the car analogy, this is something that a person can do to change the properties of the car.&lt;br /&gt;&lt;br /&gt;
+So, I know what you&amp;#39;re thinking:  &lt;em&gt;How the hell does this relate to Programming?&lt;/em&gt; Well, I&amp;#39;ll give you a real-world example:&lt;br /&gt;&lt;br /&gt;
+Say I want to have an app that, when it starts up, display a window. &lt;strong&gt;Quick Disclaimer:  This code is BY NO MEANS something that would actually work, so do NOT write to me, telling me that my example doesn&amp;#39;t work. This is just to drive my point home.&lt;/strong&gt; To do so, I would send a message to the application telling it to display a window. In this case, the application that I&amp;#39;m sending a message to is the &lt;em&gt;object&lt;/em&gt;, and the message I&amp;#39;m sending is what we call the &lt;em&gt;method&lt;/em&gt;. Remember, a method is an action you can take on an object. Again, this wouldn&amp;#39;t actually work, but...&lt;br /&gt;&lt;br /&gt;
+[Application displayWindow];&lt;br /&gt;&lt;br /&gt;
+Make sense? Good. I&amp;#39;ll go over more of proper Objective-C syntax in a later tutorial, don&amp;#39;t worry.&lt;br /&gt;&lt;br /&gt;
+I dunno about you, but I am totally ready to move on to MVC!&lt;br /&gt;&lt;br /&gt;
+&lt;h3&gt;The Model-View-Controller System&lt;/h3&gt;&lt;br /&gt;
+Now you&amp;#39;re thinking:  &lt;em&gt;Crap, this sounds complicated...&lt;/em&gt;and it is! Nah, not really. You just have to understand what we&amp;#39;re going for. The idea of MVC is it is simply a way of organizing the way that the User Interface (UI) interacts with the code, and how the code in turn can change things in the UI and respond to the user. To explain, I&amp;#39;m just going to give you a description of each element of MVC (keep in mind, these do not go in the order that they communicate in):&lt;br /&gt;
+&amp;nbsp; Model:  The model is the code base of the application. For example, a calculator&amp;#39;s model would be the class that handles operations such as multiplication, division, and more complex things if it was needed. Keep in mind, the model should &lt;em&gt;never&lt;/em&gt; interact with the interface or the user directly. This kills the whole system. It &lt;em&gt;can&lt;/em&gt;, however, send messages to the controller about what the results of an operation are, and the controller can send orders to it.&lt;br /&gt;
+&amp;nbsp; View:  This is the interface that the user interacts with or sees. In our calculator example, this would be the actual window with buttons and a numerical display area. The view can send messages to the controller about what the user is doing, but it cannot talk directly to the model. Again, this kills the whole system.&lt;br /&gt;
+&amp;nbsp; Controller:  This is a relay station of sorts. The controller takes actions sent by the view (from the user), and tells the model what to do. The model then sends back whatever data should be displayed to the user, and from there, the controller can tell the view to display it.&lt;br /&gt;&lt;br /&gt;
+I know this all may seem fairly complicated, but if you look at any well-known open-source Cocoa project, you&amp;#39;ll see that this is the accepted way of organizing your code. You&amp;#39;ll do fine with it as long as you remember that the key is to separate the brains of the application from the interface that the user sees.&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;This tutorial was written for a new developer tutorial site, which has yet to be officially launched. This post will be updated once it has launched. Until then, please comment and critique! -Carter&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Site Maintenance</title>
+		<link href="http://cartera.me/2009/04/14/site-maintenance"/>
+		<updated>2009-04-14T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/04/14/site-maintenance</id>
+		<content type="html">&lt;p&gt;Working on installing a new theme, maybe, and switching some stuff around. Expect some weird shit goin&amp;#39; down.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Metamorphosis</title>
+		<link href="http://cartera.me/2009/03/25/metamorphosis"/>
+		<updated>2009-03-25T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/03/25/metamorphosis</id>
+		<content type="html">&lt;p&gt;Papa Roach released their new album. I am in love.  &lt;/p&gt;
+
+&lt;p&gt;It is just what I need. More music. Okay, admittedly, I am full of new music already. But still, this is enough to hold me over until...well, I don&amp;#39;t know. Seether might be working on a new album, so that might come in time.  &lt;/p&gt;
+
+&lt;p&gt;Best songs in the album are Change or Die, Hollywood Whore, and I Almost Told You That I Loved You. Don&amp;#39;t go for more then 10 minutes after reading this before listening to them.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Macheist III Bundle</title>
+		<link href="http://cartera.me/2009/03/25/macheist-iii-bundle"/>
+		<updated>2009-03-25T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/03/25/macheist-iii-bundle</id>
+		<content type="html">&lt;p&gt;...sucks. I swear to god, if shareware mac devs don&amp;#39;t start hiring UI&amp;#47;icon designers, I&amp;#39;m going to pay for them myself.  &lt;/p&gt;
+
+&lt;p&gt;These are my tentative thoughts on each app that has been unlocked. I&amp;#39;ll be posting more on each app later.  &lt;/p&gt;
+
+&lt;p&gt;iSale:  I already have GarageSale, which is OK. I honestly never really sell anything on eBay, but w&amp;#47;e. The UI for this one is awkward at best, and ugly at it&amp;#39;s usual.  &lt;/p&gt;
+
+&lt;p&gt;Picturesque:  Neat idea. I already have Photoshop, PixelMator, DrawIt, GIMP, and countless other image editors. The UI of this one is in the &amp;quot;failed attempt at delicious&amp;quot; category.  &lt;/p&gt;
+
+&lt;p&gt;SousChef:  I&amp;#39;m not a cook.  &lt;/p&gt;
+
+&lt;p&gt;World of Goo:  I&amp;#39;m not a gamer.  &lt;/p&gt;
+
+&lt;p&gt;PhoneView:  SSH. I have a JailBroken phone (and I&amp;#39;m proud!), so this doesn&amp;#39;t really add anything for me. Anyways, not the best UI (in fact, it sucks), and I prefer hacking my way into the iPhone&amp;#39;s filesystem anyway.  &lt;/p&gt;
+
+&lt;p&gt;LittleSnapper:  Not bad. I have tried it before. Just never fell in love, due to my adoration for the simplicity of GrabUp. Both services have one fatal flaw:  URL length. They both generate gigantic URLs that are ugly in AIM chats, and impossible to caption in tweets. Probably will never find a place in my workflow, considering Pasta will be fixing this one flaw anyway.  &lt;/p&gt;
+
+&lt;p&gt;Acorn:  See:  Picturesque.  &lt;/p&gt;
+
+&lt;p&gt;Kinemac:  My eyes are bleeding. Bleeding. The UI for this is the worst I&amp;#39;ve ever had the displeasure of seeing. I can&amp;#39;t use it, even if I had a use for it. I would PAY them, just to uncheck the &amp;quot;Drop Shadow&amp;quot; box in the Blending Options window.  &lt;/p&gt;
+
+&lt;p&gt;As I said, there is more to write about these, but it is time for me to relax. I&amp;#39;ll be testing all of them (except for Kinemac. I cannot even look at it), and reviewing each one. Oh, and yes, I did buy it. If anyone wants a license to Kinemac, comment. I&amp;#39;ll give it to you. Hell, I&amp;#39;ll pay you to take it from me.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Knowing  - Nicolas Cage, and some terrible child actor</title>
+		<link href="http://cartera.me/2009/03/25/knowing"/>
+		<updated>2009-03-25T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/03/25/knowing</id>
+		<content type="html">&lt;p&gt;I saw the movie &amp;quot;Knowing&amp;quot; today, and I&amp;#39;m sorry that I did. It was the worst movie I&amp;#39;ve seen in a long time.  &lt;/p&gt;
+
+&lt;p&gt;The basic principle seems pretty intriguing. The idea is that a list of numbers from a time capsule that was buried 50 years ago has somehow predicted every major disaster since the time it was written. And there are 3 more to go, until the numbers run out. Nicolas Cage is first narrowly missed by a plane crash, which really doesn&amp;#39;t faze him at all. Why? Terrible directing. He then saves a baby and it&amp;#39;s mother by jumping on top of them, right as two subways collide in a busy station. I&amp;#39;ll admit, those two scenes were amazingly cool. But it went downhill from there. There was some sort of surreal, alien-ish aspect of the whole thing, that seemed to be the writer&amp;#39;s at a loss for a way out of the situation. Here, I have an idea:  have a few people die. It&amp;#39;s already a scary movie, it doesn&amp;#39;t have to end with children frolicking in a field of poorly-animated wheat. I&amp;#39;m not kidding there, that&amp;#39;s actually the ending.  &lt;/p&gt;
+
+&lt;p&gt;Aliens are a writer&amp;#39;s ace-up-the-sleeve. But that&amp;#39;s cheating. Seriously, it ruins the film. For more proof, check the last Indiana Jones film, and this one. I&amp;#39;m sorry, but the children flying away in a glowing space ship is not a good ending. Were the aliens ever mentioned beforehand? Yep. They&amp;#39;re called the &amp;quot;Whisper People.&amp;quot; The moment the little girl said that name, I totally cracked up. I&amp;#39;m sorry, but the movie jumped the shark right there.  &lt;/p&gt;
+
+&lt;p&gt;The acting was terrible. I am usually fine with Nicolas Cage, but he was directed really poorly in this film. He never did anything. And his character didn&amp;#39;t develop in the slightest. And the two children were absolutely awful. I&amp;#39;m going to steal from my brother&amp;#39;s commentary here...the little kid will do really well in the bio-pic for Keanu Reeves. No feeling, no talent. Cool!  &lt;/p&gt;
+
+&lt;p&gt;Don&amp;#39;t see this movie. You&amp;#39;ll never get those 2 hours back. Seriously, don&amp;#39;t lose the time. I recommend Frost&amp;#47;Nixon, Slumdog Millionaire, and recently, Duplicity.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Cropped Out, and Gloss</title>
+		<link href="http://cartera.me/2009/03/23/cropped-out-and-gloss"/>
+		<updated>2009-03-23T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/03/23/cropped-out-and-gloss</id>
+		<content type="html">&lt;p&gt;I know, the two topics have nothing to do with each other. And no, I&amp;#39;m not referring to the infamous MTF member Gloss, I&amp;#39;m referring to the &amp;quot;artistic&amp;quot; style of many icons nowadays.  &lt;/p&gt;
+
+&lt;h2&gt;Cropped Out&lt;/h2&gt;
+
+&lt;p&gt;In short, it&amp;#39;s a new website. You can see the work in progress as I make changes slowly at http:&amp;#47;&amp;#47;www.croppedout.com&amp;#47;wp&amp;#47; . It&amp;#39;s a gallery and store for a friend of mine, Hannah Cohen. She&amp;#39;s an incredible photographer, and she needed a site that reflected that. And yes, this is totally a shameless plug for the site. The store section isn&amp;#39;t even close to being done, and if anybody knows of any free, and extensible PHP-based shopping cart frameworks, that are compatible with PayPal, please let me know. Until it&amp;#39;s done, just enjoy the amazing pictures, and feel free to compliment me on the site (I know, it&amp;#39;s totally incredible), or Hannah on the pictures.  &lt;/p&gt;
+
+&lt;h2&gt;Gloss&lt;/h2&gt;
+
+&lt;p&gt;If you know me very well, you&amp;#39;ll know I have a personal vendetta against glossy icons and UI elements. I hate them. I hate everything about them. Real objects in the world don&amp;#39;t do that, unless they&amp;#39;re made out of glass or plastic. And my iPhone icons are not made of either. Seriously, just look at them. Leopard was a step in the right direction. I love the inset style of the text on the window titlebars, and the menubar icons. I love the silver capsule-style buttons in the toolbars. But the &amp;quot;traffic lights&amp;quot; are obnoxious and obscene. And then make the window asymmetrical, which also bugs me a lot.  &lt;/p&gt;
+
+&lt;p&gt;Matte style icons make so much more sense. Keep in mind the difference between gloss and shine. Metal shines. Glass is glossy. Huge difference. Oh well, rant over.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Random Tech Post!</title>
+		<link href="http://cartera.me/2009/03/12/random-tech-post"/>
+		<updated>2009-03-12T06:00:00-06:00</updated>
+		<id>http://cartera.me/2009/03/12/random-tech-post</id>
+		<content type="html">&lt;p&gt;I have a few topics to cover in this post, including my thoughts on Apple&amp;#39;s new iPod Shuffle, Amazon&amp;#39;s WhisperSync technology, and the Kindle 2.  &lt;/p&gt;
+
+&lt;h2&gt;Shuffle&lt;/h2&gt;
+
+&lt;p&gt;The new iPod shuffle has been met with mixed feelings from me. It is a good concept:  take a very compact flash drive, and put a headphone jack on it. Controls? Put them on the headphones. As much as I love the headphone controls, really, I do, I do sometimes like to use my Bose headphones, considering how much better they sound, and their noise canceling abilities. Supposedly there will be an adapter coming out, but still, that means I have to pay more to use my own headphones, that I already paid for. Not to say that that is Apple&amp;#39;s fault, but it&amp;#39;s not exactly going to be met with resonating applause from all the QC3 owners out there. So in essence, I&amp;#39;m saying Apple messed this up, and even if it really isn&amp;#39;t their problem, they are going to be getting a lot of complaints about it. I&amp;#39;m curious if they&amp;#39;ll be allowing third part headphone manufacturers to add the extra controls to their products:  if so, this might be salvageable.  &lt;/p&gt;
+
+&lt;p&gt;The design of the shuffle is great, overall. I like the simplicity, and the aluminum casing. They fit well with all of the new Apple product lines. The clip seems like an effective way to carry it around, instead of losing it in the depths of your pocket. I think them claiming it to be a fashion statement might be overdoing it, but you know, they&amp;#39;re entitled to saying whatever they want. Oh, and when they say that it is the first mp3 player to speak to you...they&amp;#39;re making a false claim. One of their own products, the iPod Nano, already can speak its menus to you. But since both products come from Apple...is this okay? I don&amp;#39;t honestly care.  &lt;/p&gt;
+
+&lt;h2&gt;WhisperSync&lt;/h2&gt;
+
+&lt;p&gt;This is totally my new favorite thing. With the new Kindle 2 which I have gotten my hands on, as well as the Kindle iPhone app, Amazon&amp;#39;s WhisperSync technology has been proving itself time and time again. Purchase a book on the Kindle, open the iPhone app, the book is there. Purchase a book online, it&amp;#39;s on both devices next time I look. This is the kind of system that Apple should have going with the iTunes Store. Amazon allows you to add devices to your Amazon account, and all your purchases are synchronized between all of the devices without you even knowing a thing. This could work perfectly for the iTunes Store, seriously. Apple can still have their happy little limit on authorizations, but that&amp;#39;s not what you would call it. You&amp;#39;d call them devices. And no more transferring songs to your other computer, or syncing them to your iPod (assuming you have one of the WiFi capable models, if not, you&amp;#39;re still stuck with the USB cord.) Why didn&amp;#39;t Apple do this?  &lt;/p&gt;
+
+&lt;p&gt;Part of the elegance of the system is the fact that it is completely unobtrusive. You never have to sit and wait for progress bars, watch a locked screen while something syncs, or press the refresh&amp;#47;sync button 10 times before it recognizes your need for synchronization.  &lt;/p&gt;
+
+&lt;p&gt;No, I don&amp;#39;t want this to be part of MobileMe. I don&amp;#39;t think it should need to be a paid service. The infrastructure is there, Apple just needs to build off of it.  &lt;/p&gt;
+
+&lt;h2&gt;Kindle 2&lt;/h2&gt;
+
+&lt;p&gt;My family got a Kindle 2 to test a few days ago. My experiences have been mixed, and thus, I will join the army of bloggers faithfully reviewing the device.  &lt;/p&gt;
+
+&lt;p&gt;The readability of the e-ink screen is brilliant. It causes no strain on my eyes at all, and this made the purchase worthwhile by itself. Having to look at a digital screen for hours is always what prevented me from reading e-books. Now I can. The paging through books is easy and simple as well, which made reading through a fiction novel a breeze.  &lt;/p&gt;
+
+&lt;p&gt;Now for the downside:  the UI is the worst I&amp;#39;ve ever had to deal with. The &amp;quot;5 Way Controller&amp;quot; is basically what you would expect from a Palm Pilot or Blackberry, 5 years ago. And the response time of the system is way too slow to know if what you&amp;#39;re doing is actually having any effect on the device. Maybe a throbber progress meter up in the menubar, just to clarify when it is working out a task? Something so simple as that would make the experience of navigating the UI much less frustrating. Hopefully software updates will be released to improve the usability of the interface, because as of now, it is something I dread using. Like I said, the actual reading part is great, but the rest of the user experience is full of small failures to communicate between the user and the device. Amazon:  please fix the UI. Hire a UI designer.  &lt;/p&gt;
+
+&lt;p&gt;That&amp;#39;s all for now folks, please share your thoughts in the comments (and spammers, enjoy the reCAPTCHA filter).  &lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Transcription</title>
+		<link href="http://cartera.me/2009/03/05/transcription"/>
+		<updated>2009-03-05T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/03/05/transcription</id>
+		<content type="html">&lt;p&gt;So my mom asked me to transcribe an interview for a project she&amp;#39;s doing. Here it is (ignore the terrible grammar):  &lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.opt-6.com/Downloads/Public/Interview.rtf&quot;&gt;Transcription&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;It&amp;#39;s pretty heavy. It&amp;#39;s good for if you need a bit of perspective on your own life.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Music, Again</title>
+		<link href="http://cartera.me/2009/03/01/music-again"/>
+		<updated>2009-03-01T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/03/01/music-again</id>
+		<content type="html">&lt;p&gt;A while back I did a quick post about music. Here goes another one...  &lt;/p&gt;
+
+&lt;p&gt;Currently I&amp;#39;m listening to &amp;quot;Absolute&amp;quot; by The Fray. Yes, I like The Fray. Deal with it.  &lt;/p&gt;
+
+&lt;p&gt;Seether has a new single out, &amp;quot;Careless Whisper.&amp;quot; It&amp;#39;s a cover of an older song, but their cover is absolutely bitchin. Listen to it, right now.  &lt;/p&gt;
+
+&lt;p&gt;Papa Roach, my favorite band, is releasing a new album in less than a month. They&amp;#39;ve released two singles so far, Hollywood Whore and Lifeline. Lifeline isn&amp;#39;t great, but it&amp;#39;s okay. Hollywood Whore, as I said in my previous music post, is amazingly awesome. You should listen to it. Now.  &lt;/p&gt;
+
+&lt;p&gt;Enjoy my suggestions!  &lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Safari 4</title>
+		<link href="http://cartera.me/2009/02/25/safari-4"/>
+		<updated>2009-02-25T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/02/25/safari-4</id>
+		<content type="html">&lt;p&gt;Geeky post time!  &lt;/p&gt;
+
+&lt;p&gt;The Safari 4 public beta is out! It&amp;#39;s been met with mixed feelings from me...  &lt;/p&gt;
+
+&lt;p&gt;The appearance is overall, crappy and overdone. Top sites is a good idea (not by Apple&amp;#39;s part though, it&amp;#39;s in every other browser, in some way) but the 3D effect is just cheesy and dumb. The progress bar died, and I really liked the old one. It&amp;#39;s been replaced by a throbber, which doesn&amp;#39;t really display progress at all. Thanks apple! The address bar is unified with a dumbass plus button, which is just plain terrible looking. I honestly don&amp;#39;t bookmark that much, and if I did, I&amp;#39;d use a keyboard shortcut. And the refresh button needs to come back to it&amp;#39;s usual place, please.  &lt;/p&gt;
+
+&lt;p&gt;And finally, the tabs. Oh. My. God. I get that they are copying Chrome because it&amp;#39;s a hit, but that is NOT the part people like. Chrome works well in every way, except appearance! So go ahead, get it&amp;#39;s speed, but do NOT get it&amp;#39;s look. Thus, I instantly found and used this hidden preference (enter into Terminal.app and hit return):&lt;br&gt;
+    defaults write com.apple.Safari DebugSafari4TabBarIsOnTop false&lt;br&gt;
+Okay, well, those are my criticisms. Other than those, it&amp;#39;s pretty great. Blazing fast, and it aces the Acid3 test (acid3.acidtests.org). I&amp;#39;ll keep it, as long as the tab bar preference stays.  &lt;/p&gt;
+
+&lt;p&gt;Edit:  http:&amp;#47;&amp;#47;swedishcampground.com&amp;#47;safari-4-hidden-preferences&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Insomnia</title>
+		<link href="http://cartera.me/2009/02/23/insomnia"/>
+		<updated>2009-02-23T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/02/23/insomnia</id>
+		<content type="html">&lt;p&gt;I can&amp;#39;t sleep. It&amp;#39;s 2:37 AM. Fun!  &lt;/p&gt;
+
+&lt;p&gt;I was ready to go to bed at 12:30, so I sat there in bed for a while, staring at the ceiling, and my cat. Eventually I gave up and watched some TV for a while. I spent half of the time in front of the TV staring at my cat, because he was just being weird. But I was starting to feel relaxed, and ready to go to sleep. So I went back into my bed, and tried to sleep again. Failure. So now I&amp;#39;m back at my computer, as usual. Insomnia is shit, seriously. It&amp;#39;d be kinda nice if I was actually productive at this time of night&amp;#47;morning. And yet, I&amp;#39;m really not. So here I am, writing, when I could&amp;#47;should be sleeping. I &lt;em&gt;wish&lt;/em&gt; I was sleeping. I really do. Well, my wishes never come true anyway, just add this one to the list.  &lt;/p&gt;
+
+&lt;p&gt;What to write about, what to write about... is always good for a conversation topic. We&amp;#39;re working on 3 projects right now. I have control over only one of them, but that&amp;#39;s okay. The first is Pasta, a synchronized pastebin and image hosting service, with a companion application. It&amp;#39;s pretty cool, I will admit. Preston is in charge of that one. Why? Because I just don&amp;#39;t have enough time for it. The next project is Kameleon 2, as always. Goddamnit, that project just will never die. It&amp;#39;s been a WIP since...what...September? Yeah, that&amp;#39;s it. God. Zach is in charge of that one. And then the last one is xMod 2...it&amp;#39;s looking like it might be pretty cool. An extensible system utility and preference pane, with scheduling abilities. Good, yes? Well, I&amp;#39;m pretty much stuck on the current problem of writing a custom class to display the available preferences in a list. If it ever works out, it&amp;#39;d be pretty cool. But until I can figure out Quartz rendering and how to subclass NSView, I&amp;#39;m pretty much at a standstill.  &lt;/p&gt;
+
+&lt;p&gt;That&amp;#39;s all that&amp;#39;s interesting in  land I guess. Oh, well, the new web site is pretty cool (&lt;a href=&quot;http://opt-6.com&quot; target=&quot;_blank&quot;&gt;www.opt-6.com&lt;/a&gt;), thank you Wil Nichols for the kickass design. Of course, there are a few finishing touches and stuff to do, but it&amp;#39;s pretty much there.  &lt;/p&gt;
+
+&lt;p&gt;Hmm...what else is there to write about? The academy awards were tonight, no real surprises. Sean Penn won over Frank Langella, which was kind of disappointing to me, but oh well. And Kate Winslet won for best actress, as we all knew she would. Though apparently, they had trouble finding any footage of her in The Reader where she actually had clothes on. Seriously, they overdid the nudity bit. Especially considering how not-very-attractive she is. That&amp;#39;s just my opinion of course. And then Slumdog Millionaire won best picture, of course. I was pulling for Frost&amp;#47;Nixon, but I really loved both. Yeah, that&amp;#39;s about it.  &lt;/p&gt;
+
+&lt;p&gt;I&amp;#39;ll go stare at the ceiling some more. Bye now.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Holidays</title>
+		<link href="http://cartera.me/2009/02/20/holidays"/>
+		<updated>2009-02-20T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/02/20/holidays</id>
+		<content type="html">&lt;p&gt;In the past few days, I&amp;#39;ve been considering the different categories that different holidays can fit into. My final revision is 4 categories. They are listed below.  &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Jew Day:  A day that Jews made up, where they can celebrate and we can all feel bad for them. Why? Because bad things always happen to Jews. Not that they deserve it, because they don&amp;#39;t. But look at history. Bad things consistently happen to Jews. So naturally, they created their holidays with the best of intentions, and now the rest of us can feel guilty. Cool! Examples:  All Jewish holidays.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Excuse to Get Drunk&amp;#47;Miss Work Day:  A day created by the general population of the larger nations, so that they have a reason&amp;#47;excuse to get drunk and&amp;#47;or miss work. Examples:  Labor Day, New Year&amp;#39;s Eve, Columbus Day.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Hallmark Day:  A day created by the Hallmark company so that they can sell more cards. Examples:  Valentine&amp;#39;s Day, Father&amp;#39;s&amp;#47;Mother&amp;#39;s Day, etc.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Spite the Pagans Day:  A day created by the Catholic church on the same date as a long standing Pagan holiday, just to spite them. Examples:  Christmas (see:  Winter Solstice), Easter (see:  Other solstice?), etc.&lt;br&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Pretty good list, yes? Comment with your thoughts, please.  &lt;/p&gt;
+
+&lt;p&gt;PS:  Jesus Saves, Moses Invests  &lt;/p&gt;
+
+&lt;p&gt;Edit:  I&amp;#39;ve updated the description of Jew Days to better reflect my original intentions, instead of the ones pointed out by my good Jewish friends.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Why Fergie&apos;s is now a terrible place</title>
+		<link href="http://cartera.me/2009/02/09/why-fergies-is-now-a-terrible-place"/>
+		<updated>2009-02-09T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/02/09/why-fergies-is-now-a-terrible-place</id>
+		<content type="html">&lt;p&gt;There&amp;#39;s a restaurant in the area of my school called Fergie&amp;#39;s. It started out as a frozen custard shop run by a family. Back then, it was an excellent place. They had unique menu selections, and great service. I really loved that place.  &lt;/p&gt;
+
+&lt;p&gt;A while back, it went out of business and was bought up by a slightly larger business. The restaurant sadly became more of a little diner then a frozen custard shop. This happened with mixed feelings. Some of their new menu was actually pretty good, and the custard stayed the same which was good. But the service...it changed. It was now a business, not a location. I stopped enjoying going there as much.  &lt;/p&gt;
+
+&lt;p&gt;I went back there today for some food. The person who took my order barely spoke english, and when she did, I could barely hear her due to the loud music. The music wasn&amp;#39;t bad (or particularly good), but it prevented me from hearing. Due to all of this, I have composed a short list of the things that Fergie&amp;#39;s does wrong.  &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;People need to speak english. It&amp;#39;s the United States, I know it&amp;#39;s the melting pot and all, but you&amp;#39;re serving english customers.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Music choice is not something I need to control, but if I can&amp;#39;t hear myself talk, then something is very very wrong.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Orders need to be correct. The occasional error is fine, but the massive and preventable slip ups just get annoying after a while.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;Location is important to a restaurant, and should also dictate some of how it is run. Considering most of Fergie&amp;#39;s business comes from the schools, I&amp;#39;d say they should act more like a family and less like a business.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;The atmosphere needs to feel like it hasn&amp;#39;t been completely forgotten and left behind.&lt;br&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I could go on, but I&amp;#39;d rather not right now. Got anything to add to the list? Comment away!&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>iPhone test</title>
+		<link href="http://cartera.me/2009/02/04/iphone-test"/>
+		<updated>2009-02-04T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/02/04/iphone-test</id>
+		<content type="html">&lt;p&gt;Okay, I&amp;#39;m testing the ability to post to this blog from the wordpress app on my iPhone. If you&amp;#39;re reading this, then it works. Yay!&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Big Plans</title>
+		<link href="http://cartera.me/2009/01/29/big-plans"/>
+		<updated>2009-01-29T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/01/29/big-plans</id>
+		<content type="html">&lt;p&gt;Okay, just a bit of  news for you readers. We have big plans for Wednesday, the 11th, so get ready. If you know even a piece of what I&amp;#39;m hinting at, don&amp;#39;t give anything away. But I&amp;#39;ll give you a hint, it includes a very shiny black shelf, and a hidden document. Enjoy the next couple weeks people!&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Blatant Deception</title>
+		<link href="http://cartera.me/2009/01/18/blatant-deception"/>
+		<updated>2009-01-18T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/01/18/blatant-deception</id>
+		<content type="html">&lt;p&gt;One of my parents is lying. I can&amp;#39;t tell which one.  &lt;/p&gt;
+
+&lt;p&gt;Obviously, as is the case with most families, we&amp;#39;re going through some tough financial times. By &amp;quot;we&amp;quot; I mean my mom. My dad of course married Vicki, who is providing enough money for him. Thanks, showbiz.  &lt;/p&gt;
+
+&lt;p&gt;My mom versus my dad. They each tell conflicting stories about what money changed and didn&amp;#39;t change hands after the divorce. Each of there stories depict themselves as the good guys.  &lt;/p&gt;
+
+&lt;p&gt;-I&amp;#39;ll finish this post later, gotta run.  &lt;/p&gt;
+
+&lt;p&gt;Okay, now then...  &lt;/p&gt;
+
+&lt;p&gt;My parents obviously hate each other, that much is clear. I mean, they divorced each other and now barely speak to each other. This is all made worse by the fact that they both owe each other something. My dad owes my mom, well, 10 years of her life. My dad also seemingly owes her a lot of money, but according to him that&amp;#39;s all not true. What does my mom owe my dad? Just a bit of forgiveness. Her ability to be vindictive is absolutely unparalleled.  &lt;/p&gt;
+
+&lt;p&gt;Okay, just had to rant for a bit there. The moral of this story is, don&amp;#39;t have parents.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Clogged Senses - Explained</title>
+		<link href="http://cartera.me/2009/01/12/clogged-senses-explained"/>
+		<updated>2009-01-12T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/01/12/clogged-senses-explained</id>
+		<content type="html">&lt;p&gt;My last post, &amp;quot;Clogged Senses,&amp;quot; confused a lot of people, including myself. It was late at night and my mind was a bit out of whack. Yet, when I read it again, it still all makes perfect sense to me. The key is understanding all the pieces of the analogy.  &lt;/p&gt;
+
+&lt;p&gt;Begin with the setting, a depressing city scene. No interesting features, plenty of distractions. Now see my school, where nothing is really interesting me and everything I see and interact with feels like it&amp;#39;s just bringing me further from my goals.  &lt;/p&gt;
+
+&lt;p&gt;Skyscrapers bearing down on you. Sounds a bit like those goddawful teachers&amp;#47;adults that are always watching everything you do. Waiting for you to make even a small mistake.  &lt;/p&gt;
+
+&lt;p&gt;1000s of cars, racing around you. Other people&amp;#39;s lives you never get to touch, or if you do, barely get to affect. You may occasionally connect with someone else, but if you do, it&amp;#39;s fleeting.  &lt;/p&gt;
+
+&lt;p&gt;There&amp;#39;s more to this then just that, but I&amp;#39;m not even sure what it all means. This is taken directly from a recurring nightmare I&amp;#39;ve been having for years. Any insights or ideas, comment.  &lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Clogged Senses</title>
+		<link href="http://cartera.me/2009/01/09/clogged-senses"/>
+		<updated>2009-01-09T05:00:00-07:00</updated>
+		<id>http://cartera.me/2009/01/09/clogged-senses</id>
+		<content type="html">&lt;p&gt;Bear with me for a moment here, okay? So, imagine you&amp;#39;re in the middle of a huge city. Skyscrapers all around you, blocking your view of the world around you. Cars are rushing around everywhere, and people are yelling and screaming on the sidewalks. The walls on the buildings are covered in graffiti, and windows have been smashed in. In the distance you hear gunshots, sirens, and a sharp shriek, probably from a child. You cannot hear yourself think.  &lt;/p&gt;
+
+&lt;p&gt;Awful smells surround you.  Engine fumes, smog, and rotting souls. You start to look around more, trying to see what&amp;#39;s going on. What is causing all of the noise. But your vision gets more and more clouded by black smoke and smog, obscuring all but the closest objects in a vaporous hell.  &lt;/p&gt;
+
+&lt;p&gt;Panic is setting in now. You&amp;#39;re running. Running through the streets. No way to see where you&amp;#39;re going, no way to hear who is talking to you. Screams, endless screams. Smoke, never-ending smoke. In hope that you would see something familiar, something that was progressing at all, you look down at your feet. They are running so fast, trying to get out of this hell. But they aren&amp;#39;t moving. No matter how fast you run, you get nowhere.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Music!</title>
+		<link href="http://cartera.me/2008/12/23/music"/>
+		<updated>2008-12-23T05:00:00-07:00</updated>
+		<id>http://cartera.me/2008/12/23/music</id>
+		<content type="html">&lt;p&gt;Anyone noticed how many amazingly good albums have been released lately? Lets go through a few.&lt;/p&gt;
+
+&lt;p&gt;&lt;a class=&quot;bbcode_artist&quot; href=&quot;http://www.last.fm/music/Guns+N%27+Roses&quot;&gt;Guns N&amp;#39; Roses&lt;/a&gt; release their album &lt;a class=&quot;bbcode_album&quot; title=&quot;Guns N&apos; Roses - Chinese Democracy&quot; href=&quot;http://www.last.fm/music/Guns+N%27+Roses/Chinese+Democracy&quot;&gt;Chinese Democracy&lt;/a&gt;. And pigs everywhere grew wings and flew. No, not kidding.  &lt;/p&gt;
+
+&lt;p&gt;&lt;a class=&quot;bbcode_artist&quot; href=&quot;http://www.last.fm/music/Papa+Roach&quot;&gt;Papa Roach&lt;/a&gt; released their single, &lt;a class=&quot;playbutton&quot; rel=&quot;nofollow&quot; href=&quot;http://www.last.fm/music/Papa+Roach/_/Hollywood+Whore?autostart&quot;&gt;&lt;img class=&quot;play_icon transparent_png&quot; src=&quot;http://cdn.last.fm/flatness/global/icon_play.png&quot; alt=&quot;Play&quot; width=&quot;17&quot; height=&quot;17&quot; /&gt;&lt;/a&gt;&lt;a class=&quot;bbcode_track&quot; title=&quot;Papa Roach  Hollywood Whore&quot; href=&quot;http://www.last.fm/music/Papa+Roach/_/Hollywood+Whore&quot;&gt;Hollywood Whore&lt;/a&gt;. Papa Roach is back. Everyone everywhere should shout for joy.  &lt;/p&gt;
+
+&lt;p&gt;&lt;a class=&quot;bbcode_artist&quot; href=&quot;http://www.last.fm/music/Buckcherry&quot;&gt;Buckcherry&lt;/a&gt; released a new album, &lt;a class=&quot;bbcode_album&quot; title=&quot;Buckcherry - Black Butterfly&quot; href=&quot;http://www.last.fm/music/Buckcherry/Black+Butterfly&quot;&gt;Black Butterfly&lt;/a&gt;. It&amp;#39;s really fucking good. Seriously.  &lt;/p&gt;
+
+&lt;p&gt;&lt;a class=&quot;bbcode_artist&quot; href=&quot;http://www.last.fm/music/Nickelback&quot;&gt;Nickelback&lt;/a&gt; released &lt;a class=&quot;bbcode_album&quot; title=&quot;Nickelback - Dark Horse&quot; href=&quot;http://www.last.fm/music/Nickelback/Dark+Horse&quot;&gt;Dark Horse&lt;/a&gt;. Really awesome.  &lt;/p&gt;
+
+&lt;p&gt;&lt;a class=&quot;bbcode_artist&quot; href=&quot;http://www.last.fm/music/Rise+Against&quot;&gt;Rise Against&lt;/a&gt; released &lt;a class=&quot;bbcode_album&quot; title=&quot;Rise Against - Appeal To Reason&quot; href=&quot;http://www.last.fm/music/Rise+Against/Appeal+To+Reason&quot;&gt;Appeal To Reason&lt;/a&gt;. Buy it, ASAP.  &lt;/p&gt;
+
+&lt;p&gt;&lt;a class=&quot;bbcode_artist&quot; href=&quot;http://www.last.fm/music/Fall+Out+Boy&quot;&gt;Fall Out Boy&lt;/a&gt; released &lt;a class=&quot;bbcode_album&quot; title=&quot;Fall Out Boy - Folie  Deux&quot; href=&quot;http://www.last.fm/music/Fall+Out+Boy/Folie+%C3%A0+Deux&quot;&gt;Folie  Deux&lt;/a&gt;. If you haven&amp;#39;t heard it, you need to.  &lt;/p&gt;
+
+&lt;p&gt;Yep, those are my favorites of recent times. If you don&amp;#39;t agree with them, don&amp;#39;t say a word.&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Damn Republicans.</title>
+		<link href="http://cartera.me/2008/12/23/damn-republicans."/>
+		<updated>2008-12-23T05:00:00-07:00</updated>
+		<id>http://cartera.me/2008/12/23/damn-republicans.</id>
+		<content type="html">&lt;p&gt;So a lot of people in my school hate me now. Not sure how it happened so damned quickly, but you know, that&amp;#39;s what happens when you read off a speech that calls Catholics and Republicans idiots. I swear, I told nothing but truth. Truth hurts, but in this case, it&amp;#39;s hurting me the most.  &lt;/p&gt;
+
+&lt;p&gt;My speech:&lt;br&gt;
+&lt;blockquote&gt;&lt;span&gt;&lt;span&gt; &lt;/span&gt;I spent election night in my basement alone, all the lights shut off, surrounded by humming electronics. I had been invited to 10 different election watch parties, but socializing when I could be watching election returns didnt make much sense. Thus, I opted to sit at home, where I could ignore everything except raw results. I spent about an hour preparing my own election center, complete with three televisions, four laptops, and a speaker system on a rotating cycle between the different TVs. At 5 oclock I was ready, refreshing 6 different websites, and watching all of glowing screens intently. I practically jumped out of my skin when the first state was called for Obama. And then a state to McCain. And they continued on for about 4 hours. When the race was called for Obama, I screamed for joy, and went to sleep.&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span&gt;&lt;span&gt; &lt;/span&gt;The next morning, I decided to actually look at the geography of this election. I read through the different red states, and gave them each a bit of thought:  did I ever want to go there? Was there anything worth seeing there? What is the average IQ in that state? I was most interested in the final question. It turns out that states renowned for being red are also renowned for being full of rednecks. A strange correlation between brains and blue became quite apparent. As the intelligence of a state rises, their likelihood to vote blue in the election gets higher. Throughout all of the red states, there are very few commonalities. As I just mentioned, education (or lack thereof) is one of them.But another is religion.&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span&gt;&lt;span&gt; &lt;/span&gt;As an example, let us consider Catholicism. Most Catholics are conservative, and vote red. Red states have more Catholics, judging by that fact.  And as everyone who has any real knowledge of religion knows, it oftentimes limits a persons exposure to real-world issues. Dont get me wrong here, I am not against faith. But strong beliefs in things like eating the bones of Christ, and spending every Sunday morning listening to an old man talk about nothing at all does not exactly reflect intelligence.&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span&gt;&lt;span&gt; &lt;/span&gt;After spending the whole morning thinking about how I could use this data to predict coming elections, I finally decided to use an equation. In the equation, x is equal to the percentage of a states population that has graduated from college, and y is the percentage that will vote for a republican. By no means is this perfectly accurate, but I think it is a fairly good representation:&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span&gt;100 - x = y&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span&gt;Alright fine, its perfectly accurate.&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span&gt;&lt;span&gt; &lt;/span&gt;What I am trying to say here is that Republicans are ignorant. The only reason I can imagine anyone thinking they were voting for the right person by voting Republican is if they did not fully grasp the issues at hand. Stupidity is a strong term, so I will refrain from using it, but because of where people live and how they are raised, they oftentimes do not get enough exposure to what things really matter in this world. In a country full of corrupt religion and misplaced education, how do we fix them? Move them to a blue state.&lt;/span&gt;&lt;/blockquote&gt;
+&lt;span&gt;Hmm...you can probably see how that could easily piss a lot of people off. But I go to a very liberal school. And anyway, the assignment was to create a speech that pushed the limits of everything, might offend some people, and was hilarious in the process. I think I managed that pretty well, right?&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;Apparently, one of the few Republican students at my school ran out of the room after my speech, and hid in the bathroom for a couple hours. Her mother is over 6 feet tall. I think I should be worried.  &lt;/p&gt;
+
+&lt;p&gt;Your opinions?&lt;/p&gt;
+</content>
+	</entry>
+	
+	<entry>
+		<title>Shit happens. To me. </title>
+		<link href="http://cartera.me/2008/12/14/shit-happens-to-me"/>
+		<updated>2008-12-14T05:00:00-07:00</updated>
+		<id>http://cartera.me/2008/12/14/shit-happens-to-me</id>
+		<content type="html">&lt;p&gt;How did this happen?  &lt;/p&gt;
+
+&lt;p&gt;What went wrong? What could I have done? Why does shit like this always happen to me?  &lt;/p&gt;
+
+&lt;p&gt;As you probably figured out, I&amp;#39;m just a tad bit depressed. Actually, very depressed. I had been dating her for 5 months...I thought it was going so well. I really had&amp;#47;have feelings for her. But she&amp;#39;s lost interest. She&amp;#39;s moved on. Maybe for the best. People really are best left without me, I guess. I cause sadness, depression, and anything else that&amp;#39;s horrible. I&amp;#39;m a bad influence, and a horrible friend. And now, I clearly was a horrible boyfriend. &lt;/p&gt;
+
+&lt;p&gt;Anything I touch (figuratively) goes to hell. My software went well until I tried to make it better. Now it&amp;#39;s a pain in the ass, and unsuccessful to boot. Half my friends can&amp;#39;t actually stand me, and the girl I thought I really had a connection with didn&amp;#39;t share the feeling.  &lt;/p&gt;
+
+&lt;p&gt;Damnit, I&amp;#39;m still being depressing.&lt;/p&gt;
+</content>
+	</entry>
+	
+</feed>

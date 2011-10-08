@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<!--
+	Well hello there! Feel free to look over the code here, if you'd like.
+	It is worth mentioning that the un-compiled version of the site's code
+	can be found here:  http://github.com/CarterA/cartera.me/
+-->
+<html>
+	<head>
+		
+		<meta charset="utf-8">
+		<title>Carter Allen - About This Website</title>
+		<meta name="description" content="Articles and projects written and created by developer Carter Allen.">
+		<meta name="author" content="Carter Allen">
+		<link rel="alternate" type="application/atom+xml" title="Carter Allen - Feed" href="http://feeds.feedburner.com/CarterADotMeBlog?format=xml">
+		<link rel="openid.server" href="http://www.myopenid.com/server" />
+		<link rel="openid.delegate" href="http://carterallen.myopenid.com/" />
+		<link rel="openid2.local_id" href="http://carterallen.myopenid.com" />
+		<link rel="openid2.provider" href="http://www.myopenid.com/server" />
+		
+		<meta name="viewport" content="width=device-width">
+		<link rel="stylesheet" href="/stylesheets/main.css">
+		
+        
+		<link rel="stylesheet" href="/stylesheets/post.css">
+		
+		
+	</head>
+	<body>
+	    <div id="container">
+		<header>
+		    <div class="badtie"></div>
+			<a href="/">
+				<img id="logo" src="/images/hat.png" width=190 height=100>
+				<p id="logotype">carter<b>allen</b></p>
+			</a>
+			<nav>
+			  <ul>
+				<li><a href="/">Articles</a></li>
+				<li><a href="/projects">Projects</a></li>
+				<li><a href="/archives">Archives</a></li>
+				<li><a href="/about/" rel="author">About</a></li>
+			  </ul>
+			</nav>
+		</header>
+		<section id ="content"><!-- Stylesheets: post -->
+<article class="post">
+	<header class="post-header">
+		<h1>About This Website</h1>
+		<span class="date">Aug 12, 2010</span>
+	</header>
+	<section class="post-content">
+		<p>In December of 2008, the first iteration of this website went online for the world to see. Available at the slightly-cheesy domain name &quot;lifeofcarter.com&quot; (courtesy of my friend <a href="http://wilnichols.com/">Wil Nichols</a>), it boasted a shiny theme on top of a brand-new installation of WordPress. My first post (still available in the archives of this site) was a short and emotional rant about the current state of my life. Since then I&#39;ve moved domain names, and the theme of my site has changed many times. The articles that have been written since then range from <a href="/2009/02/25/safari-4/">geeky</a> and <a href="/2009/04/15/understanding-object-oriented-programming-and-the-mvc-system/">intelligent</a> to <a href="/2009/03/05/transcription/">disturbing</a> and <a href="/2009/01/09/clogged-senses/">thought-provoking</a>, and finally to <a href="/2009/06/13/seven-ways-to-tell-if-your-band-is-too-old/">random</a> and <a href="2009/02/20/holidays/">hilarious</a>.  </p>
+
+<p>A few months ago I made the decision to switch to a different blogging engine for my site. WordPress had served me well, but it simply doesn&#39;t suit me well enough. I like lots of control, and I don&#39;t need many features. WordPress has too many features that I don&#39;t need, and more than that, I don&#39;t fully understand how it works. I also came to the realization that using a PHP system for something that gets updated <em>at most</em> once a day was a foolish use of server power:  serving static files would be much more efficient. So I set out on a search for the perfect blogging engine.  </p>
+
+<h2>Scouring the Systems</h2>
+
+<p>The first option that I encountered was <a href="http://github.com/creationix/wheat">Wheat</a>. The reason for not choosing this one was simple: my current shared hosting provider doesn&#39;t allow Node.JS, and I wasn&#39;t willing to upgrade to a VPS just for a blog. I kept in mind all of the features that Wheat offered, and continued my search.  </p>
+
+<p>The next option I found seemed pretty damn perfect, and was almost my chosen engine. <a href="http://cloudhead.io/toto">toto</a> gave me several of the features of Wheat that I loved so much:  tight integration with <a href="http://git-scm.org/">git</a>, an emphasis on static files, and support for my favorite markup language, <a href="http://daringfireball.net/projects/markdown/">Markdown</a>. I imported all of my posts from WordPress, went through each of them and reformatted them in Markdown, and configured Toto to my liking. Of course, this was all before I realized that my <em>lovely</em> shared hosting provider also doesn&#39;t <em>really</em> support Rack apps. At this point, I had two choices:  I could stick with Toto and find a different host, or I could just keep on lookin&#39;. Needless to say, I didn&#39;t switch hosts.  </p>
+
+<p>Enter <a href="http://jekyllrb.com/">Jekyll</a>. Jekyll is everything that I ever wanted in a blogging engine. Really. It isn&#39;t perfect, but what&#39;s excellent about it is that if there&#39;s something wrong, I know exactly how it works and how to fix it. Jekyll is written in Ruby, just like toto, except Jekyll doesn&#39;t rely on Rack or Rails. It runs on the your machine only, and is essentially an added &quot;build&quot; step between you and the browser. I coded this entire site in TextMate using standard HTML5 and CSS3, and then at the end I added just a few little variables to the markup. Presto-chango, my site is built and I am at peace with the world.  </p>
+
+<p>You didn&#39;t think I would leave it at that though, did you? Of course not! I haven&#39;t even <em>begun</em> to brag about all the great ways that my site works.  </p>
+
+<h2>Yard Work</h2>
+
+<p>Before I began this project, I had absolutely no knowledge of the lovely language that is <a href="http://www.ruby-lang.org/">Ruby</a>. Although I am still no professional, I have developed a fairly strong understanding of the language. One of my favorite Ruby tools is <a href="http://rake.rubyforge.org/">Rake</a> (it&#39;s like Make, but written in Ruby...get it?). All of the major stages of work on my website are  automated via Rake:  development, testing, and deployment. I can begin developing by simply running <code>cd $blog; rake</code> from Terminal. That will spin up a testing server at <a href="localhost:4000">localhost:4000</a> and will automatically regenerate files whenever I save them. All of this is accomplished with this fragment of my Rakefile:  </p>
+
+<script src="https://gist.github.com/1257930.js?file=compiling.rb"></script>
+
+<p>I used this setup to comfortably code most of my website. There comes a point, of course, where you need to deploy your beautiful website to a public-facing server. For that, I have another task: <code>rake deploy</code>  </p>
+
+<script src="https://gist.github.com/1257930.js?file=deploying.rb"></script>
+
+<p>This task is pretty simple:  it wraps a rather complicated <code>rsync</code> command into a nice-and-simple Rake task. It connects to my server via SSH using public&#47;private key pairs so that I don&#39;t have to enter a password (the Mac OS X keychain remembers the passphrase for my private key). If you have a host that lets you install gems, you can also set it up so that your server is a git remote and builds the jekyll site whenever you push to it. My host doesn&#39;t let me do this though, so I wasn&#39;t able to use that option.  </p>
+
+<p>The final bit of yard work in my Rakefile is a task which creates a new post:  </p>
+
+<script src="https://gist.github.com/1257930.js?file=newPost.rb"></script>
+
+<p>Though it&#39;s a bit more complicated than the last few tasks, it&#39;s still fairly straightforward. It starts by prompting for a title and a file name. It uses those to generate the metadata of the file, and then creates the post file based on the current date. Finally, it sends the path to <code>mate</code> (which opens the file in TextMate) so that I can start writing the post body.  </p>
+
+<p>If you&#39;d like to see the actual Rakefile, you can checkout the latest copy of it <a href="http://github.com/CarterA/cartera.me/blob/master/Rakefile.rb">on GitHub</a>.  </p>
+
+<p>Update 8&#47;22&#47;10:  I&#39;ve improved the Rake tasks that I use, and written about them in more depth <a href="/2010/08/22/streamlined-yard-work/">here</a>.</p>
+
+<h2>A Cavalcade of Cascading Styles</h2>
+
+<p>My website uses <a href="http://validator.w3.org/check?uri=http%3A%2F%2Fcartera.me%2F">valid HTML5</a>, though a vigilant (or neurotic) reader may note that the CSS used is absolutely full of invalid properties. The reason for this is fairly simple:  <a href="http://jigsaw.w3.org/css-validator/">the CSS3 validator</a> doesn&#39;t allow vendor-prefixed CSS attributes (like -webkit-border-radius, or -moz-box-shadow). I get that rule, I really do. Unfortunately, that means that it is impossible to create a website that actually looks good in most browsers and keep your CSS valid at the same time. I decided to go the &quot;works <em>and</em> looks good&quot; route, instead of taking the &quot;looks good to the validator but renders poorly and doesn&#39;t really work&quot; approach. Here&#39;s an example of how I managed to get the inset shadow of the main content area from only CSS:  </p>
+
+<script src="https://gist.github.com/1257930.js?file=boxShadow.css"></script>
+
+<p>Fun, right? It sure isn&#39;t pretty, but it gets the job done. Granted, the shadow doesn&#39;t appear in IE7 or earlier, but quite frankly, I&#39;m okay with that. Now, what <em>does</em> work in IE7 and earlier is my rounded corners:  </p>
+
+<script src="https://gist.github.com/1257930.js?file=borderRadius.css"></script>
+
+<p>The first three lines cover most browsers that visit my site, but the last line is the most impressive. The <code>behavior</code> rule is only used by IE, and it links to a local version of <a href="http://css3pie.com/">PIE</a>. PIE is a JS program that uses IE-specific &quot;filters&quot; (a rendering system only ever used by IE) to implement many of the new CSS3 features that are currently unsupported by the Microsoft browser. Let me just say that it is absolutely amazing, though my one request would be support for inset box shadows (currently being tracked in this <a href="http://github.com/lojjic/PIE/issues#issue/3">issue thread</a> on GitHub).  </p>
+
+<h2>Syntactical and Semantical Perfection</h2>
+
+<p>It doesn&#39;t take much work to get an XHTML page to validate as HTML5. In fact, it takes nothing more than a switched DOCTYPE. But when I set out to remake this site, I wanted more than just validation:  I wanted the site to actually <em>use</em> many of the new semantic elements available in the HTML5 spec. Thus, all of the articles are wrapped in <code>&lt;article&gt;</code> tags, and all of the different pages are organized using <code>&lt;section&gt;</code>&#39;s. The navigation is wrapped in a <code>&lt;nav&gt;</code> tag, and the site uses both <code>&lt;header&gt;</code> and <code>&lt;footer&gt;</code> tags (though the footer is quite empty at the moment...I should fix that.) All of these elements can even be styled just like traditional HTML elements:  but there&#39;s a catch. Some older browsers (I&#39;m looking at one in particular here, and it rhymes with blinternet blexplorer) completely screw up when they hit unknown elements. Luckily, all of this is solved by this simple line of code in my <code>head</code> tag:</p>
+
+<script src="https://gist.github.com/1257930.js?file=simpleLine.html"></script>
+
+<p>Thank goodness for <a href="http://paulirish.com/">Paul Irish</a> and his <a href="http://www.modernizr.com/">Modernizr</a> library.  </p>
+
+<h2>Et cetera...</h2>
+
+<p>I could go on for hours about this website, if only I could come up with more catchy names for sections. This post has barely touched on the great parts of this site, and way more can be found by poking around the <a href="http://github.com/CarterA/cartera.me">GitHub repository</a>. I hope I&#39;ve inspired you to create some great websites, or at least to admire this one!</p>
+
+	</section>
+	<section class="comments">
+		<div id="disqus_thread"></div>
+		<script src="http://disqus.com/forums/cartera/embed.js"></script>
+		<noscript><a href="http://cartera.disqus.com/?url=ref">View the discussion thread.</a></noscript>
+		<a href="http://disqus.com" class="dsq-brlink">Comments powered by <span class="logo-disqus">Disqus</span></a>
+	</section>
+</article></section>
+		<footer>
+			<p>Site revision <a href="http://github.com/CarterA/cartera.me/tree/"></a>. Valid <a href="http://validator.w3.org/check?uri=referer" target="_blank">HTML5</a>.</p>
+			<p>Copyright 2010 Carter Allen</p>
+			<div class="badtie"></div>
+		</footer>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<!--
+	Well hello there! Feel free to look over the code here, if you'd like.
+	It is worth mentioning that the un-compiled version of the site's code
+	can be found here:  http://github.com/CarterA/cartera.me/
+-->
+<html>
+	<head>
+		
+		<meta charset="utf-8">
+		<title>Carter Allen - Articles</title>
+		<meta name="description" content="Articles and projects written and created by developer Carter Allen.">
+		<meta name="author" content="Carter Allen">
+		<link rel="alternate" type="application/atom+xml" title="Carter Allen - Feed" href="http://feeds.feedburner.com/CarterADotMeBlog?format=xml">
+		<link rel="openid.server" href="http://www.myopenid.com/server" />
+		<link rel="openid.delegate" href="http://carterallen.myopenid.com/" />
+		<link rel="openid2.local_id" href="http://carterallen.myopenid.com" />
+		<link rel="openid2.provider" href="http://www.myopenid.com/server" />
+		
+		<meta name="viewport" content="width=device-width">
+		<link rel="stylesheet" href="/stylesheets/main.css">
+		
+        
+		<link rel="stylesheet" href="/stylesheets/post.css">
+		
+		
+	</head>
+	<body>
+	    <div id="container">
+		<header>
+		    <div class="badtie"></div>
+			<a href="/">
+				<img id="logo" src="/images/hat.png" width=190 height=100>
+				<p id="logotype">carter<b>allen</b></p>
+			</a>
+			<nav>
+			  <ul>
+				<li><a href="/">Articles</a></li>
+				<li><a href="/projects">Projects</a></li>
+				<li><a href="/archives">Archives</a></li>
+				<li><a href="/about/" rel="author">About</a></li>
+			  </ul>
+			</nav>
+		</header>
+		<section id ="content">
+
+<article class="post">
+    <header class="post-header">
+        <h1><a href="/2011/08/14/practical-corestorage" title="[Permalink] Practical Usage of CoreStorage">Practical Usage of CoreStorage</a></h1>
+        <span class="date">Aug 14, 2011</span>
+    </header>
+    <section class="post-content">
+        <p>Mac OS X Lion introduced a new low-level system for managing relationships between physical disks and file systems. Currently, the primary use of CoreStorage is to enable FileVault 2, Lion&#39;s full disk encryption system. CoreStorage includes low-level support for AES-XTS encryption, allowing a filesystem to be used on an encrypted volume without any modifications of the filesystem software. Therefor, any applications running on an encrypted volume don&#39;t need to change any of their behaviors to support the new FileVault features.  </p>
+    </section>
+    <p class="continue-reading"><a href="/2011/08/14/practical-corestorage">Continue reading &raquo;</a></p>
+</article>
+<p class="divider">~</p>
+
+<article class="post">
+    <header class="post-header">
+        <h1><a href="/2011/06/26/better-singletons" title="[Permalink] Better Singletons in Objective-C">Better Singletons in Objective-C</a></h1>
+        <span class="date">Jun 26, 2011</span>
+    </header>
+    <section class="post-content">
+        <p>Singletons are special classes which have only one valid instance in an entire application or context. They are similar to global variables in that anything that tries to access them will always find itself sending messages to the same actual object as anything else. Singletons are very common in apps that utilize Objective-C. Apple&#39;s often-used singletons include <code>NSFileManager</code> and <code>NSUserDefaults</code>.  </p>
+    </section>
+    <p class="continue-reading"><a href="/2011/06/26/better-singletons">Continue reading &raquo;</a></p>
+</article>
+<p class="divider">~</p>
+
+<article class="post">
+    <header class="post-header">
+        <h1><a href="/2010/11/10/spamsieve-1065" title="[Permalink] SpamSieve and Mac OS X 10.6.5">SpamSieve and Mac OS X 10.6.5</a></h1>
+        <span class="date">Nov 10, 2010</span>
+    </header>
+    <section class="post-content">
+        <p>Apple just released version 10.6.5 of OS X, and it updated Mail.app and the corresponding Message.framework. This means that if you are a user of the SpamSieve plugin for spam filtering in Mail.app, it will disable the bundle upon launch and tell you that it needs to be updated. Fortunately, the fix for this is simple:  </p>
+    </section>
+    <p class="continue-reading"><a href="/2010/11/10/spamsieve-1065">Continue reading &raquo;</a></p>
+</article>
+<p class="divider">~</p>
+
+<article class="post">
+    <header class="post-header">
+        <h1><a href="/2010/09/03/ridiculous-optimization" title="[Permalink] Ridiculous Optimization">Ridiculous Optimization</a></h1>
+        <span class="date">Sep 3, 2010</span>
+    </header>
+    <section class="post-content">
+        <p>The latest project I&#39;ve been working on with regards to this website is optimizing its load time. At first it was simple, obvious things: enable GZip compression on the server, minify CSS and JS, you know:  standard optimization. After that was done, the index page of my site weighed in at about <strong>21.7kb</strong>. Quite lightweight, but that wasn&#39;t good enough. So I started on the next step:  ridiculous optimization.  </p>
+    </section>
+    <p class="continue-reading"><a href="/2010/09/03/ridiculous-optimization">Continue reading &raquo;</a></p>
+</article>
+<p class="divider">~</p>
+
+<article class="post">
+    <header class="post-header">
+        <h1><a href="/2010/08/22/streamlined-yard-work" title="[Permalink] Streamlined Yard Work">Streamlined Yard Work</a></h1>
+        <span class="date">Aug 22, 2010</span>
+    </header>
+    <section class="post-content">
+        <p>In my <a href="/2010/08/12/about-this-website/">recent article</a> describing the system that powers this website, I discussed some &quot;yard work&quot;. I use this term to refer to tasks that I accomplish using Ruby&#39;s <a href="http://rake.rubyforge.org/">Rake</a>. Since I published that article, I&#39;ve made several improvements to the Rakefile that powers most of my website&#39;s common operations. As such, I figured that I&#39;d post a more in-depth description of the lovely scripting solution that I&#39;ve come up with.  </p>
+    </section>
+    <p class="continue-reading"><a href="/2010/08/22/streamlined-yard-work">Continue reading &raquo;</a></p>
+</article>
+<p class="divider">~</p>
+
+<section id="bottomNav">
+    <a href="/archives">More articles &raquo;</a>
+</section></section>
+		<footer>
+			<p>Site revision <a href="http://github.com/CarterA/cartera.me/tree/"></a>. Valid <a href="http://validator.w3.org/check?uri=referer" target="_blank">HTML5</a>.</p>
+			<p>Copyright 2010 Carter Allen</p>
+			<div class="badtie"></div>
+		</footer>
+		</div>
+	</body>
+</html>

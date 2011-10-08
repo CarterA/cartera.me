@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>Carter Allen</title>
+	<link href="http://cartera.me/feed.xml" rel="self"/>
+	<link href="http://cartera.me/"/>
+	<updated>{{XMLDate}}</updated>
+	<id>http://cartera.me/</id>
+	<author>
+		<name>Carter Allen</name>
+		<email>Carter@zcr.me</email>
+	</author>
+	{{#posts}}
+	<entry>
+		<title>{{title}}</title>
+		<link href="http://cartera.me{{relativeURL}}"/>
+		<updated>{{XMLDate}}</updated>
+		<id>http://cartera.me{{relativeURL}}</id>
+		<content type="html">{{content}}</content>
+	</entry>
+	{{/posts}}
+</feed>
