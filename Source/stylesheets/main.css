@@ -59,7 +59,7 @@ body {
 #content {
 	width: 650px;
 	margin: 0px auto;
-	padding: 20px 0px 64px 0px;
+	padding: 20px 0px 50px 0px;
 	background: white;
 }
 .divider {
@@ -84,7 +84,8 @@ nav li {
 	padding: 0em 2em 0em 0em;
 }
 #bottomNav {
-	padding: 0px 0px 25px 25px;
+    text-align: right;
+	padding: 0px 0px 25px 0px;
 	display: block;
 }
 img { border-width: 0px; }
@@ -110,7 +111,7 @@ footer {
 	width: 100%;
 	bottom: 0;
 	color: #888;
-	height: 64px;
+	height: 50px;
 	position: absolute;
 }
 
