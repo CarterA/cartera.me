@@ -35,6 +35,9 @@ body {
     text-decoration: none;
 	color: black;
 }
+#container > header a:hover {
+    text-decoration: underline;
+}
 #container > header > a {
     width: 453px;
     display: block;
