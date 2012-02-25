@@ -1,0 +1,66 @@
+# Primality Testing and Factorization in C #
+
+A couple days ago, I set to work on what seemed like a fairly straightforward project: I wanted to build a reasonably fast factorization program in plain C. I didn't need it to be able to factor massive numbers, I just wanted to create it as an exercise. This seemingly basic concept led me into the strange world of number theory, a land I had never been formally introduced to, and ultimately resulted in me gaining quite a bit of knowledge.  
+
+The concept of factorization is very simple: every positive integer can be broken down into a unique set of prime factors. This is known in number theory as the fundamental theorem of arithmetic. Actually performing factorization on even mid-sized numbers is surprisingly difficult, and this difficulty is the basis for much of modern cryptography (namely [RSA][].) If integer factorization were trivial, then many encryption standards would be equally trivial to break. My goal for this project was absolutely not to produce a revolutionary algorithm for factorization. All I wanted to do was see if I could implement some of the simpler algorithms myself, and more importantly, if I could actually *understand* what those algorithms were doing.  
+
+### Step 1: Primality Testing ###
+
+Although it may seem to only be tangentially related, the first step that I took in my quest for a factorization program was to write a straightforward function to test the primality of any integer. Testing primality isn't nearly as easy as you might think, which is why a faster implementation would cache the results of all primality tests for later use.  
+
+Before we start writing code, let's think about how to approach the problem. We are given a positive integer, and we need to know if has any factors other than 1 and itself. The almost universal first idea is to run through every number from 2 to *n* (where n is the number we are testing), and divide *n* by each number. If there is a remainder, move on to the next number. If it divides evenly, then *n* is not prime. The following function implements this most-basic solution:  
+
+<script src="https://gist.github.com/1587394.js?file=Brute%20Force%20Primality%20Test.c"></script>
+
+For future comparison, I tested the number [2147483647][] with this function. It took **26.739** seconds to conclude that the number is, in fact, prime. I'll refer to this solution as the brute-force method. It tests every possible factor, yes, but it also tests many *impossible* factors. For example, let's take 17. We start at 2, and find that 17 divided by 2 leaves a remainder, so we move on to 3. Again, we find a remainder, and move on to 4. However, think for a moment: are there any numbers that are divisible by 4 but *not* by 2? No! 4 is a multiple of 2, meaning that if a given integer *n* isn't divisible by 2, it isn't divisible by any multiple of 2 either.  
+
+The obvious optimization here is to remove all multiples of 2, or in other words, only test odd numbers. Testing only odd numbers requires only a bit of additional code:  
+
+<script src="https://gist.github.com/1587394.js?file=Primality%20Test%20With%20Only%20Odds.c"></script>
+
+This might look a bit confusing at first, but it's actually not too bad. All we're doing is looping through half as many numbers as we did before, and then testing each value for *i* by doubling it and adding 1. In practice, this means that the function only tests odd numbers (because we start at 2; if we started the loop at 1, it would only test even numbers.) Predictably, this function performs significantly better when tested with the same number as before: it took **14.079** seconds to reach the same conclusion as the original brute-force method.  
+
+There are a few directions we can go from here. The idea of eliminating multiples of 2 can be generalized to eliminate even more numbers from testing (which is a great method of simply compiling a list of prime numbers; we'll revisit this later), but this makes the code increasingly complex for smaller gains in performance. The bigger improvement we can make is by narrowing the range of numbers being tested.  
+
+Currently, the best function we have tests all odd numbers between 2 and *n*. We can make this range dramatically smaller by applying a bit of logic. All of the numbers we are going through in our loop are actually half of a pair of factors. Going back to the number 17, when we check the number 3, it is part of a pair. The other part of the pair is (17/3), or about 5.67. There's an interesting rule that can be applied here: given a number *n* with factors *c* and *d*, either *c* or *d* is greater than the square root of *n*, and the other factor is less than the square root of *n*. You can research and test this rule, but trust me, it does hold true. We can use this rule to limit the range of our search to only the numbers less than the square root of *n*. Numbers above the square root have, in essence, already been tested, since we've already tested their corresponding factors below the square root. Here is a function that applies this optimization to our previous attempt:  
+
+<script src="https://gist.github.com/1587394.js?file=Primality%20Test%20With%20Only%20Odds%20and%20Sqrt%20Limit.c"></script>
+
+It may not look like much, but guess what? This bad boy concludes that the same number we tested earlier is prime in **0.000640** seconds. That, my friends, is a significant improvement. To understand how we achieved this huge leap in performance, we need only consider how many numbers each algorithm needed to test. The original algorithm tested *n - 2* numbers (remember, we excluded 1 and *n* itself. In the case of our test number, that means testing 2147483645 values. The second algorithm tested *(n - 2)/2* numbers, meaning it had to test 1073741822 numbers. The final algorithm tests *sqrt(n) - 2* values, giving it 46340 numbers to test.  
+
+There are many more optimizations that can made to this primality test. One important observation to make about this algorithm is that it lends itself to parallelization. Split up the range into chunks, and test each chunk simultaneously. If a factor is found in any chunk, stop the whole process and conclude that the number is not prime. If every chunk is completely searched and no factors are found, then congratulations, you've found a prime! I wrote a  parallel implementation of the previous algorithm using [Grand Central Dispatch][GCD], Apple's block-based concurrency system. The function also includes a few other optimizations, which I'll leave unexplained as an exercise to the reader.  
+
+<script src="https://gist.github.com/1587394.js?file=Concurrent%20Primality%20Test%20With%20Only%20Odds%20and%20Sqrt%20Limit.c"></script>
+
+The speed improvement that this algorithm offers is highly dependent on your chosen number of chunks, and whether the number is actually prime. For the rest of this article, I'll be using the non-concurrent version of the algorithm, as it is fairly efficient while remaining simple.  
+
+### Step 2: Factorization ###
+
+Before I explain various factorization functions, I'd like to quickly go over why none of them have return values. The ideal factorization function would return an array of the prime factors of the number you gave it. However, because I am dealing with plain C, arrays must be allocated in fixed sizes. I would need to know ahead of time how many factors a number has, and that's mathematically impossible. Because this was done as an exercise, I decided to simply have the factorization functions print factors as they found them. If you were to use these functions in a more realistic environment, you would probably have access to a pre-built mutable array system. A linked list would also solve this problem, but I opted to stick with the simpler solution for the sake of education.  
+
+The simplest way of factorization is also the slowest, and bears a resemblance to the brute-force method of primality checking. From 2 to *n*, check each if each number can divide evenly into *n*. If it can, check if it is prime. If the number is prime, then you've found one of the prime factors. Add it to your list and move on. If it isn't prime, now try factoring the factor (recursively.) Eventually you'll be left with all the prime factors. This process is known as trial division, and is trivial to implement in any language.  
+
+Trial division can be improved from its most basic form through the use of a list of known prime numbers, ranging from 2 to the square root of *n*. This removes the need for constant primality testing, and also drastically reduces the total number of numbers to test. The trick is efficiently generating the necessary list of primes. The simplest method of calculating a list of prime numbers, known as the [Sieve of Eratosthenes][] is actually fairly efficient. For that reason, we'll be using it as our algorithm of choice for calculating prime numbers.  
+
+The concept of a sieve is fairly simple. Imagine a calendar, with days numbered 1 through 31. Immediately cross off 1, as we always do when dealing with primes. We know that 2 is a prime number, so don't cross it off. Now think back to our original optimization of the brute-force primality test: once you test a given factor, you can remove its multiples from the list of numbers to test. We can apply that concept here too, because any number that is a multiple of another number (other than 1, of course) is not prime. This means that we can start by crossing off every multiple of 2. After that, we move up to 3. 3 wasn't crossed off before, meaning it is prime. The rule is that if a number is not crossed off when you reach it, that number is prime. Whenever a prime number is reached, you then cross off all the multiples of that number that lie ahead. Keep going like this until you reach the end of the calendar, and then look back. You now have a list of prime numbers.  
+
+The problem with implementing this in a computer program is that it requires an array as long as the square root of *n*, which can get to be pretty big if you're dealing with large numbers. However, this is for the purposes of education, so that concern isn't really necessary. If you are playing with the code in this article and the program runs out of memory, then you're probably testing with a number that is too large for your computer to handle.  
+
+The following is an implementation of the trial division method which employs a basic prime number sieve:
+
+<script src="https://gist.github.com/1587394.js?file=Trial%20Division%20Factorization%20using%20Prime%20Sieve.c"></script>
+
+The implementation is composed of 3 different functions, in addition to the primality test function from before. The main `factorize()` function takes a number *n* and allocates the necessary memory for a sieve to hold numbers from  2 to the square root of n. It then passes this memory to the `fillPrimeSieve()` function, which uses the algorithm I described before to mark all the non-prime numbers in the sieve with a 1, leaving prime numbers denoted as 0's. Both *n* and the sieve are then passed to the `factorizeWithTrialDivisionAndSieve()` function, which factors *n* by testing each prime from the sieve. When it finds a prime factor, it divides *n* by the prime to find the other component factor. If this other factor is prime, then the last factor has been found and the function exits. If the other factor is *not* prime, then the function calls itself recursively to factor this new number. This recursion is the reason that these functions are split apart: if the algorithm was contained in one function, then the sieve would be re-filled every time the function recursed into itself, which would be a major performance hit.  
+
+This function is quite useful for even mid-sized numbers, but it begins to show its weaknesses when given a number where even the square root is large enough to cause memory issues. There are many more efficient algorithms that can be used, and this algorithm could be optimized further by caching a list of primes, as well as careful parallelization. The three most common other algorithms are [Fermat's factorization method][Fermat's method], [the quadratic sieve][Quadratic sieve], and [the general number field sieve][GNFS]. Unfortunately, the last two algorithms are beyond my math and programming capabilities, and Fermat's method is not much more efficient than trial division.  
+
+I hope you've enjoyed this brief introduction into the world of primality testing and factorization, and that the code samples I've provided are useful, if only for education. You can view all of the code samples together in [this Gist][Gist].
+
+[RSA]: http://en.wikipedia.org/wiki/RSA_(algorithm)
+[2147483647]: http://en.wikipedia.org/wiki/2147483647 "Eighth Mersenne Prime"
+[GCD]: http://developer.apple.com/library/mac/#documentation/Performance/Reference/GCD_libdispatch_Ref/Reference/reference.html
+[Sieve of Eratosthenes]: http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
+[Fermat's method]: http://en.wikipedia.org/wiki/Fermat%27s_factorization_method
+[Quadratic sieve]: http://en.wikipedia.org/wiki/Quadratic_sieve
+[GNFS]: http://en.wikipedia.org/wiki/General_number_field_sieve
+[Gist]: https://gist.github.com/1587394
