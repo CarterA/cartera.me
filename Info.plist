@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>TBSiteAuthor</key>
+	<string>Carter Allen</string>
+	<key>TBSiteBaseURL</key>
+	<string>http://cartera.me/</string>
+	<key>TBSiteFilters</key>
+	<array/>
+	<key>TBSiteName</key>
+	<string>Carter Allen</string>
+	<key>TBSiteNumberOfRecentPosts</key>
+	<integer>5</integer>
+	<key>TBSitePort</key>
+	<string></string>
+	<key>TBSiteProtocol</key>
+	<string>TBSiteProtocolSFTP</string>
+	<key>TBSiteRemotePathKey</key>
+	<string>sites/cartera.me/public</string>
+	<key>TBSiteServer</key>
+	<string>cartera.me</string>
+	<key>TBSiteUserName</key>
+	<string>carterallen</string>
+</dict>
+</plist>

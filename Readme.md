@@ -1,1 +1,1 @@
-This repository contains the source files for my personal website. The source files are compiled into a proper website by [Tribo](http://github.com/CarterA/Tribo), an Objective-C static site generator that I wrote. You can view the public site [here](http://cartera.me/).
+This repository contains the source files for my personal website. The source files are compiled into a proper website by [Tribo](http://github.com/CarterA/Tribo), Objective-C static site generator that I wrote. You can view the public site [here](http://cartera.me/).

@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-	<title>Carter Allen</title>
-	<link href="http://cartera.me/feed.xml" rel="self"/>
-	<link href="http://cartera.me/"/>
+	<title>{{name}}</title>
+	<link href="{{baseURL}}feed.xml" rel="self"/>
+	<link href="{{baseURL}}"/>
 	<updated>{{XMLDate}}</updated>
-	<id>http://cartera.me/</id>
+	<id>{{baseURL}}</id>
 	<author>
-		<name>Carter Allen</name>
-		<email>Carter@zcr.me</email>
+		<name>{{author}}</name>
 	</author>
-	{{#posts}}
+	{{#recentPosts}}
 	<entry>
 		<title>{{title}}</title>
-		<link href="http://cartera.me{{relativeURL}}"/>
+		<link href="{{site/baseURL}}{{relativeURL}}"/>
 		<updated>{{XMLDate}}</updated>
-		<id>http://cartera.me{{relativeURL}}</id>
+		<id>{{site.baseURL}}{{relativeURL}}</id>
 		<content type="html">{{content}}</content>
 	</entry>
-	{{/posts}}
+	{{/recentPosts}}
 </feed>

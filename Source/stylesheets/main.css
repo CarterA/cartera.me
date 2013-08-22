@@ -148,7 +148,8 @@ footer {
         line-height: 1.6em;
     }
     .post-content img {
-        width: 300px;
+        width: 250px !important;
+        margin: 5px !important;
     }
     .date {
         float: none !important;
