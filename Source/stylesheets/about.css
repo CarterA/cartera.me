@@ -8,10 +8,17 @@
 	margin: 0px;
 	line-height: normal;
 }
+.adr {
+	display: none;
+}
 .photo {
 	float: left;
 	margin-right: 20px;
 	border-radius: 5px;
+}
+#bio {
+	font-size: 14px;
+	margin: 10px 0px 10px 0px;
 }
 #links {
 	width: 300px;
@@ -30,11 +37,3 @@
 	background: url(../images/icons/email.png) 1px 1px no-repeat; 
 }
 #aim { background: url(../images/icons/aim.png) 1px 1px no-repeat; }
-#skype { background: url(../images/icons/skype.png) 1px 1px no-repeat; }
-#ember { background: url(../images/icons/ember.png) 1px 1px no-repeat; }
-#flickr { background: url(../images/icons/flickr.png) 1px 1px no-repeat; }
-#google { background: url(../images/icons/google.png) 1px 1px no-repeat; }
-#lastfm { background: url(../images/icons/lastfm.png) 1px 1px no-repeat; }
-#linkedin { background: url(../images/icons/linkedin.png) 1px 1px no-repeat; }
-#vimeo { background: url(../images/icons/vimeo.png) 1px 1px no-repeat; }
-#youtube { background: url(../images/icons/youtube.png) 1px 1px no-repeat; }
